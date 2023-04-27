@@ -30,14 +30,7 @@ In a new virtual environment, install simply the package via pipy:
 pip install loggerml
 ```
 
-For **development**, install the package dynamically and dev requirements with:
-
-```bash
-pip install -e .
-pip install -r requirements-dev.txt
-```
-
-**Be careful, Windows 10 is not supported (Windows 11 yes).**
+**Be careful, Windows 10 is not supported (but Windows 11 yes).**
 
 ## Quick start
 
@@ -140,6 +133,13 @@ The progress bar is replaced by a cyclic animation. The eta times are not know a
 - [ ] Add color customization for message, epoch/batch number and time
 
 ## How to contribute
+
+For **development**, install the package dynamically and dev requirements with:
+
+```bash
+pip install -e .
+pip install -r requirements-dev.txt
+```
 
 Everyone can contribute to LogML, and we value everyone’s contributions.
 Please see our [contributing guidelines](CONTRIBUTING.md) for more information 🤗
