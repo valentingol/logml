@@ -39,7 +39,10 @@ def main() -> None:
             logger.reset()
             logger.bold_keys = False
             logger.n_batches = None
-    logger.log({'new loss': 0.3}, styles='red', digits=3, message='\n')
+    logger.log({'new loss1': 0.3, 'new loss2': 0.3, 'new loss3': 0.3, 'new loss4': 0.3,
+                'new loss5': 0.3, 'new loss6': 0.3, 'new loss7': 0.3, 'new loss8': 0.3,
+                'new loss9': 0.3, 'new loss10': 0.3, 'new loss11': 0.3,
+                'new loss12': 0.3}, styles='red', digits=3, message='\n')
 
 
 if __name__ == '__main__':
