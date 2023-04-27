@@ -38,7 +38,11 @@ def test_logger() -> None:
             logger.reset()
             logger.bold_keys = False
             logger.n_batches = None
-    logger.log({'new loss': 0.3}, styles='red', digits=3, message='\n')
+    logger.log({'new loss1': 0.4, 'new loss2': 0.5, 'new loss3': 0.6, 'new loss4': 0.8,
+                'new loss5': 0.4, 'new loss6': 0.5, 'new loss7': 0.6, 'new loss8': 0.8,
+                'new loss9': 0.4, 'new loss10': 0.5, 'new loss11': 0.6,
+                'new loss12': 0.4, 'new loss13': 0.5, 'new loss14': 0.6,
+                'new loss15': 0.4}, styles='red', digits=3, message='\n')
 
     with check.raises(ValueError):
         logger = Logger(2, 5)
