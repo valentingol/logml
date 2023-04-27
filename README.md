@@ -1,5 +1,5 @@
 
-# LogML - Machine Learning Logger in the console
+# LoggerML - Machine Learning Logger in the console
 
 Log your Machine Learning training in the console in a beautiful way ✨
 and with minimal code.

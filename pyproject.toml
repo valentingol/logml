@@ -2,7 +2,7 @@
 requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
 
 [project]
-name = "logml"
+name = "loggerml"
 authors = [
     {name="Valentin Goldite", email="valentin.goldite@gmail.com"},
 ]

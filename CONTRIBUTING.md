@@ -1,6 +1,6 @@
-# Contributing to LogML
+# Contributing to LoggerML
 
-Everyone can contribute to LogML, and we value everyone’s contributions.
+Everyone can contribute to LoggerML, and we value everyone’s contributions.
 There are several ways to contribute, including:
 
 - Raising [issue](https://github.com/valentingol/logml/issues)
