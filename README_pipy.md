@@ -4,7 +4,7 @@
 Log your Machine Learning training in the console in a beautiful way ✨
 and with minimal code.
 
-Support all Unix and Emacs distribution and Windows 11.
+Support all Unix and Emacs distribution as well as Windows 11.
 
 [![Release](https://img.shields.io/github/v/release/valentingol/logml?include_prereleases)](https://github.com/valentingol/logml/releases)
 ![PythonVersion](https://img.shields.io/badge/python-3.8%20%7E%203.11-informational)
@@ -49,12 +49,22 @@ for _ in range(4):
     logger.start_epoch()  # Indicate the start of a new epoch
     for _ in range(20):
         logger.start_batch()  # Indicate the start of a new batch
-        # Log every 2 batches but you should call the log method at every batch
         logger.log({'loss': 0.54321256, 'accuracy': 0.85244777})
 ```
 
 Yields:
-![Alt Text](assets/base.gif)
+
+```script
+Epoch 1/4, batch 20/20
+[================================================][100%]
+[global 00:00:02 > 00:00:06 | epoch 00:00:02 > 00:00:00]
+loss: 0.5432 | accuracy: 0.8524 |
+
+Epoch 2/4, batch 8/20
+[=================>                              ][40%]
+[global 00:00:03 > 00:00:05 | epoch 00:00:01 > 00:00:01]
+loss: 0.5432 | accuracy: 0.8524 |
+```
 
 Now you can customize the logger with your own styles and colors. You can set the default configuration at the initialization of the logger and then you can override it during log. For instance:
 
@@ -82,11 +92,37 @@ for _ in range(4):
 ```
 
 Yields:
-![Alt Text](assets/advanced.gif)
+
+```script
+Epoch 1/4, batch 20/20
+[================================================][100%]
+loss: 0.5432 | accuracy: 0.8524 |
+
+Epoch 2/4, batch 7/20
+[=================>                              ][35%]
+[global 00:00:03 > 00:00:05 | epoch 00:00:01 > 00:00:01]
+loss: 0.5432 | accuracy: 0.8524 |
+Training is going well?
+Yes!
+```
+
+With the following style and coloration:
+
+<span style="color:red">***loss***: *0.5432*</span> | <span style="color:yellow">**accuracy**: 0.8524</span> |
 
 Finally, if you don't have the number of batches in advance, you can initialize the logger with `n_batches=None`. Only the available information will be displayed. For instance with the configuration of the first example:
 
-![Alt Text](assets/no_n_batches.png)
+```script
+Epoch 1/4, batch 20/20
+[  *                                             ][ ? %]
+[global 00:00:02 >  ? | epoch 00:00:02 >  ? ]
+loss: 0.5432 | accuracy: 0.8524 |
+
+Epoch 2/4, batch 8/20
+[                           *                     ][ ? %]
+[global 00:00:03 > 00:00:05 | epoch 00:00:01 > 00:00:01]
+loss: 0.5432 | accuracy: 0.8524 |
+```
 
 The progress bar is replaced by a cyclic animation. The eta times are not know at the first epoch but was estimated after the second epoch.
 
