@@ -33,7 +33,7 @@ sh pre-commit-checks.sh
 ```
 
 **Try to not decrease the global Pylint score** after a pull request. A minimum
-of 7.0/10.0 is required but **we preferably want above 9.0/10.0.**
+of 8.5/10.0 is required but **we preferably want above 9.0/10.0.**
 
 ## Commit message
 

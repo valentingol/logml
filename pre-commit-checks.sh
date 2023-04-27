@@ -41,7 +41,7 @@ printf "\n${GREEN}${BOLD}All checks pass${NORMAL}${WHITE}\n\n"
 echo "*********** Style evaluation ***********"
 score=$(pylint . | sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p')
 
-echo "Pylint score: ${BOLD}$score/10.0${NORMAL} (details by running: pylint .)\nMinimum authorized score: 7.0\n"
+echo "Pylint score: ${BOLD}$score/10.0${NORMAL} (details by running: pylint .)\nMinimum authorized score: 8.5\n"
 
 echo "*********** Integration tests **********"
 python tests/integration/logger.py
