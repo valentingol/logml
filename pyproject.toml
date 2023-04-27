@@ -15,7 +15,7 @@ classifiers = [
 dynamic = ["readme", "dependencies", "version"]
 
 [tool.setuptools]
-py-modules = ["logml"]
+packages = ["logml"]
 license-files = ['LICEN[CS]E*', 'COPYING*', 'NOTICE*', 'AUTHORS*']
 
 [tool.setuptools_scm]
