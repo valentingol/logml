@@ -6,9 +6,7 @@ and with minimal code.
 
 Support all Unix and Emacs distribution and Windows 11.
 
-**Be careful, Windows 10 is not supported.**
-
-![Release](https://img.shields.io/github/v/release/valentingol/logml?include_prereleases)](https://github.com/valentingol/logml/releases)
+[![Release](https://img.shields.io/github/v/release/valentingol/logml?include_prereleases)](https://github.com/valentingol/logml/releases)
 ![PythonVersion](https://img.shields.io/badge/python-3.8%20%7E%203.11-informational)
 [![License](https://img.shields.io/github/license/valentingol/logml?color=999)](https://stringfixer.com/fr/MIT_license)
 
@@ -23,22 +21,16 @@ Support all Unix and Emacs distribution and Windows 11.
 
 [![Tests](https://github.com/valentingol/logml/actions/workflows/tests.yaml/badge.svg)](https://github.com/valentingol/logml/actions/workflows/tests.yaml)
 [![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/valentingol/451f91cece4478ebc81377e27e432f8b/raw/logml_tests.json)](https://github.com/valentingol/logml/actions/workflows/tests.yaml)
-[![Bandit](https://github.com/valentingol/logml/actions/workflows/bandit.yaml/badge.svg)](https://github.com/valentingol/logml/actions/workflows/bandit.yaml)
 
 ## Installation
 
 In a new virtual environment, install simply the package via pipy:
 
 ```bash
-pip install logml
+pip install loggerml
 ```
 
-For **development**, install the package dynamically and dev requirements with:
-
-```bash
-pip install -e .
-pip install -r requirements-dev.txt
-```
+**Be careful, Windows 10 is not supported (but Windows 11 yes).**
 
 ## Quick start
 
@@ -46,6 +38,7 @@ Integrate the LogML logger in your training loop. For instance for 4 epochs,
 20 batches per epoch and a log interval of 2 batches:
 
 ```python
+from logml import Logger
 
 logger = Logger(
     n_epochs=4,
@@ -104,6 +97,13 @@ The progress bar is replaced by a cyclic animation. The eta times are not know a
 - [ ] Add color customization for message, epoch/batch number and time
 
 ## How to contribute
+
+For **development**, install the package dynamically and dev requirements with:
+
+```bash
+pip install -e .
+pip install -r requirements-dev.txt
+```
 
 Everyone can contribute to LogML, and we value everyone’s contributions.
 Please see our [contributing guidelines](CONTRIBUTING.md) for more information 🤗
