@@ -6,20 +6,15 @@
 Welcome to LoggerML's documentation!
 ====================================
 
-.. include:: ../README.md
+.. toctree::
+   :glob:
+   :maxdepth: 1
+   ../README.md
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-   installation
-   quickstart
-   modules
-   logml
-   lic.md
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   installation.md
+   quickstart.md
+   core
+   license.md
