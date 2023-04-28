@@ -82,6 +82,7 @@ disallow_any_generics = false
 disallow_incomplete_defs = true
 disallow_untyped_calls = true
 disallow_untyped_defs = true
+exclude = ['*/_version.py', '*/__init__.py']
 files = '*.py'
 follow_imports = 'skip'
 follow_imports_for_stubs = false
