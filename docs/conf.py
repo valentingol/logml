@@ -7,9 +7,7 @@ import sys
 
 from setuptools_scm import get_version
 
-sys.path.insert(0, os.path.abspath('../..'))
-
-from logml import __version__  # noqa E402
+sys.path.insert(0, os.path.abspath('../'))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -17,7 +15,10 @@ from logml import __version__  # noqa E402
 project = 'LoggerML'
 copyright = '2023, Valentin Goldite'  # noqa A001
 author = 'Valentin Goldite'
-release = get_version(root='..', relative_to=__file__)
+try:
+    release = get_version()
+except:  # noqa E722
+    release = get_version(root='..', relative_to=__file__)
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
