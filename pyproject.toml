@@ -7,7 +7,7 @@ authors = [
     {name="Valentin Goldite", email="valentin.goldite@gmail.com"},
 ]
 description = """Log your ml training in the console in an attractive way."""
-requires-python = ">=3.8"
+requires-python = ">=3.7"
 keywords = ["logging", "machine", "learning"]
 classifiers = [
     "Programming Language :: Python :: 3",

@@ -4,8 +4,6 @@
 Log your Machine Learning training in the console in a beautiful way ✨
 and with minimal code.
 
-Support all Unix and Emacs distribution and Windows 11.
-
 [![Release](https://img.shields.io/github/v/release/valentingol/logml?include_prereleases)](https://github.com/valentingol/logml/releases)
 ![PythonVersion](https://img.shields.io/badge/python-3.8%20%7E%203.11-informational)
 [![License](https://img.shields.io/github/license/valentingol/logml?color=999)](https://stringfixer.com/fr/MIT_license)
@@ -24,13 +22,28 @@ Support all Unix and Emacs distribution and Windows 11.
 
 ## Installation
 
-In a new virtual environment, install simply the package via pipy:
+In a new virtual environment, install simply the package via
+[pipy](https://pypi.org/project/loggerml/):
 
 ```bash
 pip install loggerml
 ```
 
-**Be careful, Windows 10 is not supported (but Windows 11 yes).**
+## Supported platforms
+
+This package assume that you are using a terminal that support ANSI escape sequences.
+See [here](https://en.wikipedia.org/wiki/ANSI_escape_code#Platform_support) for
+supported platforms. All Unix and Emacs distribution are supported as well as Windows
+but only on some machine (Windows 11 seems to work but not Windows 10).
+
+The quick test to know if your terminal support ANSI escape sequence is to run the
+following command in your terminal:
+
+```script
+python -c "print('\x1B')"
+```
+
+It should print an *empty* line.
 
 ## Quick start
 
