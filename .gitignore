@@ -19,3 +19,4 @@ venv
 .coverage
 tests/tmp
 run.py
+logml/_version.py
