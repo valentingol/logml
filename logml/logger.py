@@ -23,6 +23,9 @@ class Logger():
         Number of batches per epoch. Set to None if not available.
     log_interval : int, optional
         Number of batches between each log. By default 1.
+    name: Optional[str], optional
+        Name of the logger. It will be display at the top of the logs.
+        By default None (no name).
     styles : Union[Dict, str], optional
         Default style of the values. These styles can be set or
         overwritten in the log method. Include color, bold, italic and more
@@ -41,6 +44,9 @@ class Logger():
         Default list of the values to average over the epoch.
         This can be overwritten in the log method.
         By default None.
+    highlight : bool, optional
+        Whether to highlight the logs or not with rich. Do not affect
+        the values (see `styles` for that). By default False.
     silent : bool, optional
         Whether to print the logs or not. By default False.
     show_bar : bool, optional
@@ -49,6 +55,8 @@ class Logger():
         Whether to show the time or not. By default True.
     bold_keys : bool, optional
         Whether to bold the key or not. By default False.
+    name_style: Optional[str], optional
+        Style of the name. Ignored if name is None. By default white.
     """
 
     def __init__(
@@ -56,20 +64,25 @@ class Logger():
         n_epochs: int,
         n_batches: Optional[int],
         log_interval: int = 1,
+        name: Optional[str] = None,
         *,
         styles: Union[Dict, str] = 'white',
         digits: Union[Dict, int] = 6,
         average: Optional[List[str]] = None,
+        highlight: bool = False,
         silent: bool = False,
         show_bar: bool = True,
         show_time: bool = True,
         bold_keys: bool = False,
+        name_style: Optional[str] = None,
     ) -> None:
         # Log parameters
         self.silent = silent
+        self.name = name
         self.show_bar = show_bar
         self.show_time = show_time
         # Default configs
+        self.name_style = name_style
         self.default_styles = styles
         self.default_digits = digits
         self.default_average: Dict = {key: True for key in average} if average else {}
@@ -78,29 +91,30 @@ class Logger():
         self.n_epochs = n_epochs
         self.n_batches = n_batches
         self.log_interval = log_interval
-        self.iter = 0
-        self.start_glob = time.time()
-        self.start_epoch = -1.0
+        self.step = 0
+        self.start_glob = 0.0
+        self.start()  # Now, self.start_glob = time.time()
+        self.start_epoch = 0.0
         self.current_epoch = 0
         self.current_batch = 0
-        self.last_log_lines = 0
+        self.log_lines = 0
         # Internal values
         self.vals: Dict = {}
         self.counts: Dict = {}
         self.mean_vals: Dict = {}
         # Rich print
-        self._console = Console(highlight=False)
+        self._console = Console(highlight=highlight)
         self._print = (self._console).print
 
     def start(self) -> None:
-        """Start the training."""
+        """Set the start time of the training (already called at initialization)."""
         self.start_glob = time.time()
 
     def reset(self) -> None:
-        """Reset the logger."""
-        self.iter = 0
+        """Reset the logger like initialization."""
+        self.step = 0
         self.start_glob = time.time()
-        self.start_epoch = -1.0
+        self.start_epoch = 0.0
         self.current_epoch = 0
         self.current_batch = 0
         self.vals = {}
@@ -108,7 +122,14 @@ class Logger():
         self.counts = {}
 
     def new_epoch(self, *, detach_log: bool = True) -> None:
-        """Start a new epoch."""
+        """Start a new epoch.
+
+        Parameters
+        ----------
+        detach_log : bool, optional
+            If True, the logs of previous epochs will remain visible.
+            If False, the logs will be overwritten. By default True.
+        """
         self.start_epoch = time.time()
         self.current_epoch += 1
         self.current_batch = 0
@@ -116,12 +137,12 @@ class Logger():
         self.mean_vals = {key: 0 for key in self.mean_vals}
         # "Detach" the logs from the previous epoch
         if not self.silent and detach_log:
-            self.last_log_lines = 0
+            self.log_lines = 0
             print()
 
     def new_batch(self) -> None:
         """Start a new batch."""
-        self.iter += 1
+        self.step += 1
         self.current_batch += 1
 
     def _prelog_check(self) -> None:
@@ -184,12 +205,12 @@ class Logger():
 
         cursor.hide()  # Prevent cursor to blinking
         # Move cursor to the beginning of the previous log
-        if self.last_log_lines > 0:
-            print(f"\x1B[{self.last_log_lines}A", end="")
-
-        # Update "last log lines" count
-        self.last_log_lines = 2 + int(self.show_bar) + int(self.show_time)
-
+        if self.log_lines > 0:
+            print(f"\x1B[{self.log_lines}A", end="")
+        # Store log line count
+        self.log_lines = 0
+        # Print name (if exists)
+        self._print_name()
         # Print epoch and batch info
         self._print_epoch_batch()
         # Print bar (if available)
@@ -197,7 +218,6 @@ class Logger():
         # Print time info (when available)
         self._print_time_info()
         average_dict = {key: True for key in average} if average else {}
-
         # Print keys and values
         self._print_keys_vals(
             values,
@@ -222,26 +242,13 @@ class Logger():
             self.mean_vals[key] = mean
         self.vals[key] = val
 
-    @staticmethod
-    def _get_param(
-        key: str,
-        log_configs: Union[DictVarType, VarType, None],
-        default_configs: Union[VarType, Dict[str, VarType]],
-        *,
-        default_value: VarType
-    ) -> VarType:
-        """Get the parameter for the key on log_configs or default_configs."""
-        if isinstance(log_configs, (int, float, str, bool)):
-            config = log_configs
-        elif log_configs and key in log_configs:
-            config = log_configs[key]
-        elif not isinstance(default_configs, Dict):
-            config = default_configs
-        elif isinstance(default_configs, Dict) and key in default_configs:
-            config = default_configs[key]
-        else:
-            config = default_value
-        return config
+    def _print_name(self) -> None:
+        """Print the name of the logger."""
+        if self.name:
+            self._print(self.name, end='', style=self.name_style)
+            # NOTE: Add clear line escape token to avoid overlapping
+            print('\x1B[0K')
+            self.log_lines += 1
 
     def _print_epoch_batch(self) -> None:
         """Print epoch and batch info."""
@@ -253,6 +260,7 @@ class Logger():
                         f"batch {self.current_batch}", end='')
         # NOTE: Add clear line escape token to avoid overlapping
         print('\x1B[0K')
+        self.log_lines += 1
 
     def _print_bar(self) -> None:
         """Print progress bar."""
@@ -268,7 +276,7 @@ class Logger():
             else:
                 # NOTE: We don't know the number of batches, so we just print
                 # a bar that cycles every 20 log intervals
-                progress = (self.iter // self.log_interval) % 20
+                progress = (self.step // self.log_interval) % 20
                 arrow_len = int(53 * progress / 19)
                 arrowhead = '●'
                 self._print(f"[{'·' * arrow_len}{arrowhead}{'·' * (53-arrow_len)}]",
@@ -276,6 +284,7 @@ class Logger():
 
             # NOTE: Add clear line escape token to avoid overlapping
             print('\x1B[0K')
+            self.log_lines += 1
 
     def _print_time_info(self) -> None:
         """Print time info."""
@@ -293,14 +302,14 @@ class Logger():
             delta_epoch_str = sec_to_timestr(delta_epoch)
             eta_glob_str = sec_to_timestr(eta_glob) if eta_glob is not None else ' ? '
             eta_epoch_str = sec_to_timestr(eta_epoch)if eta_epoch is not None else ' ? '
-            time_str = (f"\\[global {delta_glob_str} > {eta_glob_str} | "
-                        f"epoch {delta_epoch_str} > {eta_epoch_str}]")
+            time_str = (f"\\[global {delta_glob_str} < {eta_glob_str} | "
+                        f"epoch {delta_epoch_str} < {eta_epoch_str}]")
 
             self._print(time_str, sep='', end='', overflow='ellipsis')
             # NOTE: Add clear line escape token to avoid overlapping
             print('\x1B[0K')
             # Add the extra number of lines printed due to overflow
-            self.last_log_lines += len(time_str) // self._console.width
+            self.log_lines += 1 + len(time_str) // self._console.width
 
     def _print_keys_vals(
         self,
@@ -346,27 +355,49 @@ class Logger():
                 # NOTE: Add clear line escape token to avoid overlapping
                 print('\x1B[0K')
                 line_len = 0
-                self.last_log_lines += 1
+                self.log_lines += 1
             if line_len != 0:
                 # Exists previous key-value pair in the line: add separator
                 self._print(' | ', end='')
                 str_len += 2
             # Print key
             if self.bold_keys:
-                self._print(key, style='bold ' + str(style), end=': ')
+                self._print(key, style='bold ' + str(style), end=': ', highlight=False)
             else:
-                self._print(key, style=style, end=': ')
+                self._print(key, style=style, end=': ', highlight=False)
             # Print value
-            self._print(val, style=style, end='')
+            self._print(val, style=style, end='', highlight=False)
             line_len += str_len
         # NOTE: Add clear line escape token to avoid overlapping
         print('\x1B[0K')
+        self.log_lines += 1
+
+    @staticmethod
+    def _get_param(
+        key: str,
+        log_configs: Union[DictVarType, VarType, None],
+        default_configs: Union[VarType, Dict[str, VarType]],
+        *,
+        default_value: VarType
+    ) -> VarType:
+        """Get the parameter for the key on log_configs or default_configs."""
+        if isinstance(log_configs, (int, float, str, bool)):
+            config = log_configs
+        elif log_configs and key in log_configs:
+            config = log_configs[key]
+        elif not isinstance(default_configs, Dict):
+            config = default_configs
+        elif isinstance(default_configs, Dict) and key in default_configs:
+            config = default_configs[key]
+        else:
+            config = default_value
+        return config
 
     def _print_message(self, message: Optional[str]) -> None:
         """Print message."""
         if message:
             for line in message.split('\n'):
-                self._print(line, end='')
+                self._print(line, end='', highlight=False)
                 # NOTE: Add clear line escape token to avoid overlapping
                 print('\x1B[0K')
-            self.last_log_lines += message.count('\n') + 1
+            self.log_lines += 1 + message.count('\n')
