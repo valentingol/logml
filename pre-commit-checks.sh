@@ -44,4 +44,5 @@ score=$(pylint . | sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p'
 echo "Pylint score: ${BOLD}$score/10.0${NORMAL} (details by running: pylint .)\nMinimum authorized score: 8.5\n"
 
 echo "*********** Integration tests **********"
-python tests/integration/logger.py
+python tests/integration/inte_logger.py
+python tests/integration/inte_two_loggers.py

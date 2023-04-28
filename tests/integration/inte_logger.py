@@ -1,4 +1,4 @@
-"""Integration tests."""
+"""Integration tests for Logger."""
 
 import time
 
@@ -17,6 +17,7 @@ def main() -> None:
         styles='yellow',
         average=['train loss'],
         bold_keys=True,
+        highlight=True,
     )
     logger.start()
     for i in range(2):

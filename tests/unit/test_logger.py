@@ -17,6 +17,8 @@ def test_logger() -> None:
         styles='yellow',
         average=['train loss', 'train acc'],
         bold_keys=True,
+        name='Training',
+        name_style='bold dark_orange',
     )
     logger.start()
     for i in range(2):

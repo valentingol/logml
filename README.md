@@ -1,8 +1,9 @@
 
 # LoggerML - Machine Learning Logger in the console
 
-Log your Machine Learning training in the console in a beautiful way ✨
-and with minimal code.
+Log your Machine Learning training in the console in a beautiful way using
+[rich](https://github.com/Textualize/rich)✨ with useful information but with
+minimal code.
 
 [![Release](https://img.shields.io/github/v/release/valentingol/logml?include_prereleases)](https://github.com/valentingol/logml/releases)
 ![PythonVersion](https://img.shields.io/badge/python-3.8%20%7E%203.11-informational)
@@ -67,6 +68,7 @@ for _ in range(4):
 ```
 
 Yields:
+
 ![Alt Text](assets/base.gif)
 
 Now you can customize the logger with your own styles and colors. You can set the default configuration at the initialization of the logger and then you can override it during log. For instance:
@@ -95,6 +97,7 @@ for _ in range(4):
 ```
 
 Yields:
+
 ![Alt Text](assets/advanced.gif)
 
 Finally, if you don't have the number of batches in advance, you can initialize the logger with `n_batches=None`. Only the available information will be displayed. For instance with the configuration of the first example:
