@@ -7,19 +7,21 @@ import sys
 
 sys.path.insert(0, os.path.abspath('../..'))
 
+from logml import __version__  # noqa E402
+
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'LoggerML'
 copyright = '2023, Valentin Goldite'  # noqa A001
 author = 'Valentin Goldite'
-release = '0.2.6'
+release = __version__
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 # Add napoleon to the extensions list
-extensions = ['myst_parser', 'sphinx.ext.napoleon']
+extensions = ['sphinx.ext.napoleon']
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
