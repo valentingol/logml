@@ -14,11 +14,10 @@ Copyright (C) 2023  Valentin Goldité
 from logml.logger import Logger
 
 try:
-    from logml._version import version as __version__
-    from logml._version import version_tuple
+    from logml._version import __version__, __version_tuple__
 except ImportError:
     __version__ = "unknown version"
-    version_tuple = (0, 0, "unknown version")
+    __version_tuple__ = (0, 0, "unknown version")
 
 
-__all__ = ['__version__', 'version_tuple', 'Logger']
+__all__ = ['__version__', '__version_tuple__', 'Logger']
