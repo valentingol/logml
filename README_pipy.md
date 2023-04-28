@@ -1,8 +1,9 @@
 
 # LoggerML - Machine Learning Logger in the console
 
-Log your Machine Learning training in the console in a beautiful way ✨
-and with minimal code.
+Log your Machine Learning training in the console in a beautiful way using
+[rich](https://github.com/Textualize/rich)✨ with useful information but with
+minimal code.
 
 [![Release](https://img.shields.io/github/v/release/valentingol/logml?include_prereleases)](https://github.com/valentingol/logml/releases)
 ![PythonVersion](https://img.shields.io/badge/python-3.8%20%7E%203.11-informational)
@@ -109,19 +110,18 @@ Yields:
 ```script
 Epoch 1/4, batch 20/20
 [================================================][100%]
-loss: 0.5432 | accuracy: 0.8524 |
+loss: 0.5432 | accuracy: 85 |
 
 Epoch 2/4, batch 7/20
 [=================>                              ][35%]
 [global 00:00:03 > 00:00:05 | epoch 00:00:01 > 00:00:01]
-loss: 0.5432 | accuracy: 0.8524 |
+loss: 0.5432 | accuracy: 85 |
 Training is going well?
 Yes!
 ```
 
-With the following style and coloration:
+With "loss: 0.5432" in italic red, "accuracy: 85" in yellow and both keys in bold.
 
-<span style="color:red">***loss***: *0.5432*</span> | <span style="color:yellow">**accuracy**: 0.8524</span> |
 
 Finally, if you don't have the number of batches in advance, you can initialize the logger with `n_batches=None`. Only the available information will be displayed. For instance with the configuration of the first example:
 
