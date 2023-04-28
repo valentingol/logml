@@ -122,8 +122,9 @@ Yes!
 
 With "loss: 0.5432" in italic red, "accuracy: 85" in yellow and both keys in bold.
 
-
-Finally, if you don't have the number of batches in advance, you can initialize the logger with `n_batches=None`. Only the available information will be displayed. For instance with the configuration of the first example:
+Finally, if you don't have the number of batches in advance, you can initialize the
+logger with `n_batches=None`. Only the available information will be displayed.
+For instance with the configuration of the first example:
 
 ```script
 Epoch 1/4, batch 20/20
