@@ -25,13 +25,18 @@ except:  # noqa E722
 
 # Add napoleon to the extensions list
 extensions = [
-    'myst_parser',
+    "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
 ]
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-
+master_doc = "index"
+autoapi_dirs = ["logml"]
+autodoc_default_options = {
+    "member-order": "bysource",
+    "undoc-members": True,
+}
 
 # Napoleon settings
 napoleon_google_docstring = True
