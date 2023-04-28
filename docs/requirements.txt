@@ -1,3 +1,6 @@
+autoapi
 myst-parser
 setuptools_scm
+sphinx-autoapi
+sphinx-autodoc-typehints
 sphinx_rtd_theme
