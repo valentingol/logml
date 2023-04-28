@@ -7,13 +7,14 @@ Welcome to LoggerML's documentation!
 ====================================
 
 .. toctree::
-   :maxdepth: 5
+   :maxdepth: 2
    :caption: Contents:
 
-   usage/installation
-   usage/quickstart
-   docs/source/modules
-   docs/source/logml
+   installation
+   quickstart
+   modules
+   logml
+   lic.md
 
 Indices and tables
 ==================
