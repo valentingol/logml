@@ -19,6 +19,7 @@ packages = ["logml"]
 license-files = ['LICEN[CS]E*', 'COPYING*', 'NOTICE*', 'AUTHORS*']
 
 [tool.setuptools_scm]
+write_to = "logml/_version.py"
 
 [project.urls]
 Source = "https://github.com/valentingol/logml"
