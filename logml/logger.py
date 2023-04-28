@@ -1,5 +1,5 @@
 """Logger class."""
-
+import os
 import time
 from typing import Dict, List, Optional, Union
 
@@ -76,6 +76,8 @@ class Logger:
         bold_keys: bool = False,
         name_style: Optional[str] = None,
     ) -> None:
+        # Activate ANSI escape sequences on Windows (do nothing on other OS)
+        os.system('')
         # Log parameters
         self.silent = silent
         self.name = name
@@ -111,7 +113,7 @@ class Logger:
         self.start_glob = time.time()
 
     def reset(self) -> None:
-        """Reset the logger like initialization."""
+        """Reset the logger like at initialization."""
         self.step = 0
         self.start_glob = time.time()
         self.start_epoch = 0.0
@@ -122,7 +124,7 @@ class Logger:
         self.counts = {}
 
     def new_epoch(self, *, detach_log: bool = True) -> None:
-        """Start a new epoch.
+        """Declare a new epoch.
 
         Parameters
         ----------
@@ -141,7 +143,7 @@ class Logger:
             print()
 
     def new_batch(self) -> None:
-        """Start a new batch."""
+        """Declare a new batch."""
         self.step += 1
         self.current_batch += 1
 
