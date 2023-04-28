@@ -14,4 +14,4 @@ Copyright (C) 2023  Valentin Goldité
 from logml._version import __version__, __version_tuple__
 from logml.logger import Logger
 
-__all__ = ['__version__', '__version_tuple__', 'Logger']
+__all__ = ["__version__", "__version_tuple__", "Logger"]
