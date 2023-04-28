@@ -9,8 +9,4 @@ Welcome to LoggerML's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-   ../README.md
-   installation.md
-   quickstart.md
    core
-   license.md
