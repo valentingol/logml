@@ -1,5 +1,5 @@
-# Configuration file for the Sphinx documentation builder.
-#
+"""Configuration file for the Sphinx documentation builder."""
+# pylint: disable=all
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 import os
@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'LoggerML'
-copyright = '2023, Valentin Goldite'
+copyright = '2023, Valentin Goldite'  # noqa A001
 author = 'Valentin Goldite'
 release = '0.2.6'
 
