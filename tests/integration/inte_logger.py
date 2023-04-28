@@ -13,9 +13,9 @@ def main() -> None:
         n_epochs=n_epochs,
         n_batches=n_batches,
         log_interval=2,
-        digits={'train acc': 2},
-        styles='yellow',
-        average=['train loss'],
+        digits={"train acc": 2},
+        styles="yellow",
+        average=["train loss"],
         bold_keys=True,
         highlight=True,
     )
@@ -26,25 +26,28 @@ def main() -> None:
             for batch in range(n_batches):
                 logger.new_batch()
                 time.sleep(0.02)
-                styles = {'train loss': 'green', 'train acc': 'blue'}
+                styles = {"train loss": "green", "train acc": "blue"}
                 logger.log(
-                    {'train loss': 1 - epoch/n_epochs,
-                     'train acc': 100 * batch/n_batches,
-                     'mse': 0.2,
-                     },
-                    message='This is...\nok?',
+                    {
+                        "train loss": 1 - epoch / n_epochs,
+                        "train acc": 100 * batch / n_batches,
+                        "mse": 0.2,
+                    },
+                    message="This is...\nok?",
                     styles=styles,
-                    average=['mse'],
+                    average=["mse"],
                 )
         if i == 0:
             logger.reset()
             logger.bold_keys = False
             logger.n_batches = None
-    logger.log({'new loss1': 0.3, 'new loss2': 0.3, 'new loss3': 0.3, 'new loss4': 0.3,
-                'new loss5': 0.3, 'new loss6': 0.3, 'new loss7': 0.3, 'new loss8': 0.3,
-                'new loss9': 0.3, 'new loss10': 0.3, 'new loss11': 0.3,
-                'new loss12': 0.3}, styles='red', digits=3, message='\n')
+    logger.log(
+        {f"new loss{i}": 0.3 for i in range(1, 13)},
+        styles="red",
+        digits=3,
+        message="\n",
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

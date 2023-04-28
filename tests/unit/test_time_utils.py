@@ -9,13 +9,13 @@ from logml.time_utils import get_time_range, sec_to_timestr
 def test_get_time_range() -> None:
     """Test get_time_range."""
     params: Mapping[str, Any] = {
-        'current_time': 4.0,
-        'start_glob': 1.0,
-        'start_epoch': 3.0,
-        'current_epoch': 2,
-        'current_batch': 5,
-        'n_epochs': 4,
-        'n_batches': 10,
+        "current_time": 4.0,
+        "start_glob": 1.0,
+        "start_epoch": 3.0,
+        "current_epoch": 2,
+        "current_batch": 5,
+        "n_epochs": 4,
+        "n_batches": 10,
     }
     (delta_glob, delta_epoch, eta_glob, eta_epoch) = get_time_range(
         current_time=4.0,
@@ -59,7 +59,7 @@ def test_get_time_range() -> None:
     check.is_none(eta_glob)
     check.is_none(eta_epoch)
 
-    for key in ['current_batch', 'current_epoch', 'n_epochs', 'n_batches']:
+    for key in ["current_batch", "current_epoch", "n_epochs", "n_batches"]:
         with check.raises(ValueError):
             get_time_range(**{**params, key: 0})
 

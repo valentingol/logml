@@ -12,7 +12,7 @@ VarType = Union[int, float, str, bool]
 DictVarType = Union[Dict[str, int], Dict[str, float], Dict[str, str], Dict[str, bool]]
 
 
-class Logger():
+class Logger:
     """Logger class. Handles int, float, str and bool values.
 
     Parameters
@@ -66,7 +66,7 @@ class Logger():
         log_interval: int = 1,
         name: Optional[str] = None,
         *,
-        styles: Union[Dict, str] = 'white',
+        styles: Union[Dict, str] = "white",
         digits: Union[Dict, int] = 6,
         average: Optional[List[str]] = None,
         highlight: bool = False,
@@ -149,11 +149,15 @@ class Logger():
         """Check if the logger is ready to log."""
         err_message = ""
         if self.current_epoch == 0:
-            err_message += ("You must indicate a new epoch before logging "
-                            "with `logger.new_epoch()` at start of the epoch.\n")
+            err_message += (
+                "You must indicate a new epoch before logging "
+                "with `logger.new_epoch()` at start of the epoch.\n"
+            )
         if self.current_batch == 0:
-            err_message += ("You must indicate a new batch before logging "
-                            "with `logger.new_batch()` just after batch loading.\n")
+            err_message += (
+                "You must indicate a new batch before logging "
+                "with `logger.new_batch()` just after batch loading.\n"
+            )
         if err_message:
             raise ValueError(err_message)
 
@@ -194,11 +198,11 @@ class Logger():
         for key, val in values.items():
             self._update_val(key, val)
         # No log if it is not the moment
-        if (self.silent  # Never log if silent
-            or (self.current_batch % self.log_interval != 0
-                and self.current_batch != 1  # Log the first batch
-                and (self.n_batches is None
-                     or self.current_batch != self.n_batches))):  # Log the last batch
+        if self.silent or (  # Never log if silent
+            self.current_batch % self.log_interval != 0
+            and self.current_batch != 1  # Log the first batch
+            and (self.n_batches is None or self.current_batch != self.n_batches)
+        ):  # Log the last batch
             return
 
         # Here we log
@@ -223,7 +227,7 @@ class Logger():
             values,
             styles=styles,  # type: ignore
             digits=digits,  # type: ignore
-            average=average_dict
+            average=average_dict,
         )
         # Print message (if available)
         self._print_message(message)
@@ -237,29 +241,36 @@ class Logger():
             self.mean_vals[key] = 0
         self.counts[key] += 1
         if isinstance(val, (int, float)):
-            mean = ((self.mean_vals[key] * (self.counts[key]-1) + val)
-                    / self.counts[key])
+            mean = (self.mean_vals[key] * (self.counts[key] - 1) + val) / self.counts[
+                key
+            ]
             self.mean_vals[key] = mean
         self.vals[key] = val
 
     def _print_name(self) -> None:
         """Print the name of the logger."""
         if self.name:
-            self._print(self.name, end='', style=self.name_style)
+            self._print(self.name, end="", style=self.name_style)
             # NOTE: Add clear line escape token to avoid overlapping
-            print('\x1B[0K')
+            print("\x1B[0K")
             self.log_lines += 1
 
     def _print_epoch_batch(self) -> None:
         """Print epoch and batch info."""
         if self.n_batches is not None:
-            self._print(f"Epoch {self.current_epoch}/{self.n_epochs}, "
-                        f"batch {self.current_batch}/{self.n_batches}", end='')
+            self._print(
+                f"Epoch {self.current_epoch}/{self.n_epochs}, "
+                f"batch {self.current_batch}/{self.n_batches}",
+                end="",
+            )
         else:
-            self._print(f"Epoch {self.current_epoch}/{self.n_epochs}, "
-                        f"batch {self.current_batch}", end='')
+            self._print(
+                f"Epoch {self.current_epoch}/{self.n_epochs}, "
+                f"batch {self.current_batch}",
+                end="",
+            )
         # NOTE: Add clear line escape token to avoid overlapping
-        print('\x1B[0K')
+        print("\x1B[0K")
         self.log_lines += 1
 
     def _print_bar(self) -> None:
@@ -268,22 +279,29 @@ class Logger():
             if self.n_batches is not None:
                 progress = min(100, int(100 * self.current_batch / self.n_batches))
                 arrow_len = int(47 * progress / 100)
-                arrowhead = '>' if arrow_len < 47 else '='
-                in_progress = '*' if progress < 100 else ''
-                self._print(f"[{'=' * arrow_len}{arrowhead}{'·' * (47-arrow_len)}]"
-                            f"[{progress}%{in_progress}]",
-                            sep='', end='', overflow='ellipsis')
+                arrowhead = ">" if arrow_len < 47 else "="
+                in_progress = "*" if progress < 100 else ""
+                self._print(
+                    f"[{'=' * arrow_len}{arrowhead}{'·' * (47-arrow_len)}]"
+                    f"[{progress}%{in_progress}]",
+                    sep="",
+                    end="",
+                    overflow="ellipsis",
+                )
             else:
                 # NOTE: We don't know the number of batches, so we just print
                 # a bar that cycles every 20 log intervals
                 progress = (self.step // self.log_interval) % 20
                 arrow_len = int(53 * progress / 19)
-                arrowhead = '●'
-                self._print(f"[{'·' * arrow_len}{arrowhead}{'·' * (53-arrow_len)}]",
-                            end='', overflow='ellipsis')
+                arrowhead = "●"
+                self._print(
+                    f"[{'·' * arrow_len}{arrowhead}{'·' * (53-arrow_len)}]",
+                    end="",
+                    overflow="ellipsis",
+                )
 
             # NOTE: Add clear line escape token to avoid overlapping
-            print('\x1B[0K')
+            print("\x1B[0K")
             self.log_lines += 1
 
     def _print_time_info(self) -> None:
@@ -300,14 +318,18 @@ class Logger():
             )
             delta_glob_str = sec_to_timestr(delta_glob)
             delta_epoch_str = sec_to_timestr(delta_epoch)
-            eta_glob_str = sec_to_timestr(eta_glob) if eta_glob is not None else ' ? '
-            eta_epoch_str = sec_to_timestr(eta_epoch)if eta_epoch is not None else ' ? '
-            time_str = (f"\\[global {delta_glob_str} < {eta_glob_str} | "
-                        f"epoch {delta_epoch_str} < {eta_epoch_str}]")
+            eta_glob_str = sec_to_timestr(eta_glob) if eta_glob is not None else " ? "
+            eta_epoch_str = (
+                sec_to_timestr(eta_epoch) if eta_epoch is not None else " ? "
+            )
+            time_str = (
+                f"\\[global {delta_glob_str} < {eta_glob_str} | "
+                f"epoch {delta_epoch_str} < {eta_epoch_str}]"
+            )
 
-            self._print(time_str, sep='', end='', overflow='ellipsis')
+            self._print(time_str, sep="", end="", overflow="ellipsis")
             # NOTE: Add clear line escape token to avoid overlapping
-            print('\x1B[0K')
+            print("\x1B[0K")
             # Add the extra number of lines printed due to overflow
             self.log_lines += 1 + len(time_str) // self._console.width
 
@@ -326,50 +348,39 @@ class Logger():
             count += 1
             # Get style, digits and average
             style = self._get_param(
-                key,
-                styles,
-                self.default_styles,
-                default_value='white'
+                key, styles, self.default_styles, default_value="white"
             )
-            n_digit = self._get_param(
-                key,
-                digits,
-                self.default_digits,
-                default_value=6
-            )
+            n_digit = self._get_param(key, digits, self.default_digits, default_value=6)
             avg = self._get_param(
-                key,
-                average,
-                self.default_average,
-                default_value=False
+                key, average, self.default_average, default_value=False
             )
             # Modify value
             if isinstance(val, (int, float)):
                 if avg:
                     val = self.mean_vals[key]
-                val = str(val)[:int(n_digit)].ljust(int(n_digit))
+                val = str(val)[: int(n_digit)].ljust(int(n_digit))
             # str_len: expected length of the string to be printed
             str_len = len(key) + 2 + len(val)
             if line_len + str_len > self._console.width:
                 # Go to next line
                 # NOTE: Add clear line escape token to avoid overlapping
-                print('\x1B[0K')
+                print("\x1B[0K")
                 line_len = 0
                 self.log_lines += 1
             if line_len != 0:
                 # Exists previous key-value pair in the line: add separator
-                self._print(' | ', end='')
+                self._print(" | ", end="")
                 str_len += 2
             # Print key
             if self.bold_keys:
-                self._print(key, style='bold ' + str(style), end=': ', highlight=False)
+                self._print(key, style="bold " + str(style), end=": ", highlight=False)
             else:
-                self._print(key, style=style, end=': ', highlight=False)
+                self._print(key, style=style, end=": ", highlight=False)
             # Print value
-            self._print(val, style=style, end='', highlight=False)
+            self._print(val, style=style, end="", highlight=False)
             line_len += str_len
         # NOTE: Add clear line escape token to avoid overlapping
-        print('\x1B[0K')
+        print("\x1B[0K")
         self.log_lines += 1
 
     @staticmethod
@@ -378,7 +389,7 @@ class Logger():
         log_configs: Union[DictVarType, VarType, None],
         default_configs: Union[VarType, Dict[str, VarType]],
         *,
-        default_value: VarType
+        default_value: VarType,
     ) -> VarType:
         """Get the parameter for the key on log_configs or default_configs."""
         if isinstance(log_configs, (int, float, str, bool)):
@@ -396,8 +407,8 @@ class Logger():
     def _print_message(self, message: Optional[str]) -> None:
         """Print message."""
         if message:
-            for line in message.split('\n'):
-                self._print(line, end='', highlight=False)
+            for line in message.split("\n"):
+                self._print(line, end="", highlight=False)
                 # NOTE: Add clear line escape token to avoid overlapping
-                print('\x1B[0K')
-            self.log_lines += 1 + message.count('\n')
+                print("\x1B[0K")
+            self.log_lines += 1 + message.count("\n")
