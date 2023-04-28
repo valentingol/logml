@@ -6,7 +6,7 @@ Log your Machine Learning training in the console in a beautiful way using
 minimal code.
 
 [![Release](https://img.shields.io/github/v/release/valentingol/logml?include_prereleases)](https://github.com/valentingol/logml/releases)
-![PythonVersion](https://img.shields.io/badge/python-3.8%20%7E%203.11-informational)
+![PythonVersion](https://img.shields.io/badge/python-3.7%20%7E%203.11-informational)
 [![License](https://img.shields.io/github/license/valentingol/logml?color=999)](https://stringfixer.com/fr/MIT_license)
 
 [![Ruff_logo](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v1.json)](https://github.com/charliermarsh/ruff)
@@ -48,7 +48,9 @@ It should print an *empty* line.
 
 ## Quick start
 
-Integrate the LogML logger in your training loop. For instance for 4 epochs,
+### Minimal usage
+
+Integrate the LogML logger in your training loops! For instance for 4 epochs,
 20 batches per epoch and a log interval of 2 batches:
 
 ```python
@@ -80,13 +82,14 @@ Epoch 2/4, batch 8/20
 loss: 0.5432 | accuracy: 0.8524 |
 ```
 
-Now you can customize the logger with your own styles and colors. You can set the default configuration at the initialization of the logger and then you can override it during log. For instance:
+### Advanced usage
+
+Now you can customize the logger with your own styles and colors. You can set the default configuration at the initialization of the logger and then you can override it during log. You can also log the averaged value over the epoch. For instance:
 
 ```python
 logger = Logger(
     n_epochs=4,
     n_batches=20,
-    # (Log interval by default is 1, log every batch)
     styles='yellow',
     digits={'accuracy': 2},
     average=['loss'],  # loss will be averaged over the current epoch
@@ -122,29 +125,10 @@ Yes!
 
 With "loss: 0.5432" in italic red, "accuracy: 85" in yellow and both keys in bold.
 
-Finally, if you don't have the number of batches in advance, you can initialize the
-logger with `n_batches=None`. Only the available information will be displayed.
-For instance with the configuration of the first example:
+### Don't know the number of batches in advance?
 
-```script
-Epoch 1/4, batch 20/20
-[  *                                             ][ ? %]
-[global 00:00:02 >  ? | epoch 00:00:02 >  ? ]
-loss: 0.5432 | accuracy: 0.8524 |
-
-Epoch 2/4, batch 8/20
-[                           *                     ][ ? %]
-[global 00:00:03 > 00:00:05 | epoch 00:00:01 > 00:00:01]
-loss: 0.5432 | accuracy: 0.8524 |
-```
-
-The progress bar is replaced by a cyclic animation. The eta times are not know at the first epoch but was estimated after the second epoch.
-
-## Todo
-
-- [ ] Manage a validation loop (then multiple loggers)
-- [ ] Enable not using `new_epoch/log()` if log config is minimal
-- [ ] Add color customization for message, epoch/batch number and time
+If you don't have the number of batches in advance, you can initialize the
+logger with `n_batches=None`. The progress bar is replaced by a cyclic animation. The eta times are not know at the first epoch but was estimated after the second epoch.
 
 ## How to contribute
 

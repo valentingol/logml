@@ -11,14 +11,7 @@ Copyright (C) 2023  Valentin Goldité
     DISTRIBUTION and PRIVATE USE as long as the original license is
     include as well as this copy right notice.
 """
+from logml._version import __version__, __version_tuple__
 from logml.logger import Logger
 
-try:
-    from logml._version import version as __version__
-    from logml._version import version_tuple
-except ImportError:
-    __version__ = "unknown version"
-    version_tuple = (0, 0, "unknown version")
-
-
-__all__ = ['__version__', 'version_tuple', 'Logger']
+__all__ = ['__version__', '__version_tuple__', 'Logger']
