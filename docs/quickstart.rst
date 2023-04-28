@@ -8,7 +8,8 @@ Minimal usage
 
 Integrate the LogML logger in your training loops! For instance for 4 epochs,
 20 batches per epoch and a log interval of 2 n_batches:
-::
+
+.. code:: python
 
     from logml import Logger
 
@@ -24,7 +25,8 @@ Integrate the LogML logger in your training loops! For instance for 4 epochs,
             logger.log({'loss': 0.54321256, 'accuracy': 0.85244777})
 
 Yields:
-::
+
+.. code:: text
 
     Epoch 1/4, batch 20/20
     [================================================][100%]
@@ -44,7 +46,8 @@ Now you can customize the logger with your own styles and colors.
 You can set the default configuration at the initialization of the logger and then
 you can override it during log. You can also log the averaged value over the epoch.
 For instance:
-::
+
+.. code:: python
 
     logger = Logger(
         n_epochs=4,
@@ -67,7 +70,8 @@ For instance:
             )
 
 Yields:
-::
+
+.. code:: text
 
     Epoch 1/4, batch 20/20
     [================================================][100%]
