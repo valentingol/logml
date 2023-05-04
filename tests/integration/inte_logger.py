@@ -17,7 +17,6 @@ def main() -> None:
         styles="yellow",
         average=["train loss"],
         bold_keys=True,
-        highlight=True,
     )
     logger.start()
     for i in range(2):
@@ -31,7 +30,8 @@ def main() -> None:
                     {
                         "train loss": 1 - epoch / n_epochs,
                         "train acc": 100 * batch / n_batches,
-                        "mse": 0.2,
+                        "loss name": 'mse',
+                        "best run": True,
                     },
                     message="This is...\nok?",
                     styles=styles,
@@ -42,7 +42,7 @@ def main() -> None:
             logger.bold_keys = False
             logger.n_batches = None
     logger.log(
-        {f"new loss{i}": 0.3 for i in range(1, 13)},
+        {f"new loss{i}": 0.3 for i in range(1, 20)},
         styles="red",
         digits=3,
         message="\n",

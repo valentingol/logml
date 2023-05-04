@@ -1,11 +1,14 @@
 """Logger class."""
-import os
+import atexit
 import time
 from typing import Dict, List, Optional, Union
 
-import cursor
-from rich.console import Console
+from rich.console import Group
+from rich.live import Live
+from rich.table import Table
+from rich.text import Text
 
+from logml import RICH_CONSOLE
 from logml.time_utils import get_time_range, sec_to_timestr
 
 VarType = Union[int, float, str, bool]
@@ -44,9 +47,6 @@ class Logger:
         Default list of the values to average over the epoch.
         This can be overwritten in the log method.
         By default None.
-    highlight : bool, optional
-        Whether to highlight the logs or not with rich. Do not affect
-        the values (see `styles` for that). By default False.
     silent : bool, optional
         Whether to print the logs or not. By default False.
     show_bar : bool, optional
@@ -63,21 +63,18 @@ class Logger:
         self,
         n_epochs: int,
         n_batches: Optional[int],
-        log_interval: int = 1,
+        log_interval: Optional[int] = 1,
         name: Optional[str] = None,
         *,
         styles: Union[Dict, str] = "white",
         digits: Union[Dict, int] = 6,
         average: Optional[List[str]] = None,
-        highlight: bool = False,
         silent: bool = False,
         show_bar: bool = True,
         show_time: bool = True,
         bold_keys: bool = False,
         name_style: Optional[str] = None,
     ) -> None:
-        # Activate ANSI escape sequences on Windows (do nothing on other OS)
-        os.system('')
         # Log parameters
         self.silent = silent
         self.name = name
@@ -99,21 +96,28 @@ class Logger:
         self.start_epoch = 0.0
         self.current_epoch = 0
         self.current_batch = 0
-        self.log_lines = 0
         # Internal values
         self.vals: Dict = {}
-        self.counts: Dict = {}
+        self._counts: Dict = {}
         self.mean_vals: Dict = {}
-        # Rich print
-        self._console = Console(highlight=highlight)
-        self._print = (self._console).print
+        # Rich elements
+        self.live = Live(
+            renderable=None,
+            console=RICH_CONSOLE,
+            refresh_per_second=4,
+            auto_refresh=False,
+        )
+        self.renderable = None
+        self.console = RICH_CONSOLE
+        atexit.register(self.stop)
 
     def start(self) -> None:
         """Set the start time of the training (already called at initialization)."""
         self.start_glob = time.time()
 
     def reset(self) -> None:
-        """Reset the logger like at initialization."""
+        """Reset the logger as at initialization."""
+        self.stop()
         self.step = 0
         self.start_glob = time.time()
         self.start_epoch = 0.0
@@ -121,26 +125,54 @@ class Logger:
         self.current_batch = 0
         self.vals = {}
         self.mean_vals = {}
-        self.counts = {}
+        self._counts = {}
+        self.live = Live(
+            renderable=None,
+            console=RICH_CONSOLE,
+            refresh_per_second=4,
+            auto_refresh=False,
+        )
+        self.renderable = None
 
-    def new_epoch(self, *, detach_log: bool = True) -> None:
-        """Declare a new epoch.
-
-        Parameters
-        ----------
-        detach_log : bool, optional
-            If True, the logs of previous epochs will remain visible.
-            If False, the logs will be overwritten. By default True.
-        """
+    def new_epoch(self, *, reset_avg: bool = True) -> None:
+        """Declare a new epoch."""
         self.start_epoch = time.time()
         self.current_epoch += 1
         self.current_batch = 0
-        self.counts = {key: 0 for key in self.counts}
-        self.mean_vals = {key: 0 for key in self.mean_vals}
+        if reset_avg:
+            self._counts = {key: 0 for key in self._counts}
+            self.mean_vals = {key: 0 for key in self.mean_vals}
         # "Detach" the logs from the previous epoch
-        if not self.silent and detach_log:
-            self.log_lines = 0
-            print()
+        self.detach()
+        self.live = Live(
+            renderable=None,
+            console=RICH_CONSOLE,
+            refresh_per_second=4,
+            auto_refresh=False,
+        )
+        self.renderable = None
+        # Start the new live display
+        self.live.start()
+
+    def detach(self, *, skipline: bool = True) -> None:
+        """Stop the live display.
+
+        Stop the live display while keeping the current display visible in
+        the terminal.
+        """
+        if self.console._live is not None:  # pylint: disable=protected-access
+            self.console._live.stop()  # pylint: disable=protected-access
+            self.console.clear_live()
+        if not self.silent and skipline:
+            self.console.print('')
+
+    def stop(self) -> None:
+        """Stop the live display.
+
+        Stop the live display while keeping the current display visible in
+        the terminal. Alias for `detach(skipline=False)`.
+        """
+        self.detach(skipline=False)
 
     def new_batch(self) -> None:
         """Declare a new batch."""
@@ -199,191 +231,176 @@ class Logger:
         # Update internal values
         for key, val in values.items():
             self._update_val(key, val)
-        # No log if it is not the moment
-        if self.silent or (  # Never log if silent
-            self.current_batch % self.log_interval != 0
-            and self.current_batch != 1  # Log the first batch
-            and (self.n_batches is None or self.current_batch != self.n_batches)
-        ):  # Log the last batch
+        # Never log if silent
+        if self.silent:
             return
 
-        # Here we log
+        # Update the live display
 
-        cursor.hide()  # Prevent cursor to blinking
-        # Move cursor to the beginning of the previous log
-        if self.log_lines > 0:
-            print(f"\x1B[{self.log_lines}A", end="")
-        # Store log line count
-        self.log_lines = 0
-        # Print name (if exists)
-        self._print_name()
-        # Print epoch and batch info
-        self._print_epoch_batch()
-        # Print bar (if available)
-        self._print_bar()
-        # Print time info (when available)
-        self._print_time_info()
-        average_dict = {key: True for key in average} if average else {}
-        # Print keys and values
-        self._print_keys_vals(
-            values,
-            styles=styles,  # type: ignore
-            digits=digits,  # type: ignore
-            average=average_dict,
+        renderables = []
+
+        # Add Name (if exists)
+        if self.name:
+            renderables.append(self._build_name())
+        # Add epoch and batch info line
+        renderables.append(self._build_epoch_batch())
+        # Add bar (if activated)
+        if self.show_bar:
+            renderables.append(self._build_bar())
+        # Build time info (if activated)
+        if self.show_time:
+            renderables.append(self._build_time_info())
+        # Build keys and values table
+        if len(values) > 0:
+            average_dict = {key: True for key in average} if average else {}
+            vals_table = self._build_keys_vals(
+                values,
+                styles=styles,  # type: ignore
+                digits=digits,  # type: ignore
+                average=average_dict,
+            )
+            renderables.append(vals_table)
+        # Build message (if exists)
+        if message:
+            renderables.append(self._build_message(message))
+
+        # Create renderable group and update the live display
+        self.renderable = Group(*renderables)
+        refresh = (
+            # auto refresh regularly if no log interval
+            self.log_interval is None
+            # refresh at log intervals
+            or self.current_batch % self.log_interval == 0
+            # refresh at first batch
+            or self.current_batch == 1
+            # refresh at last batch (if n_batches is specified)
+            or (self.n_batches and self.current_batch == self.n_batches)
         )
-        # Print message (if available)
-        self._print_message(message)
-        cursor.show()  # Restore cursor
+        self.live.update(renderable=self.renderable, refresh=refresh)
 
     def _update_val(self, key: str, val: VarType) -> None:
         """Update the internal values."""
-        if key not in self.counts:
-            self.counts[key] = 0
+        if key not in self._counts:
+            self._counts[key] = 0
         if key not in self.mean_vals:
             self.mean_vals[key] = 0
-        self.counts[key] += 1
+        self._counts[key] += 1
         if isinstance(val, (int, float)):
-            mean = (self.mean_vals[key] * (self.counts[key] - 1) + val) / self.counts[
-                key
-            ]
+            mean = (
+                (self.mean_vals[key] * (self._counts[key] - 1) + val)
+                / self._counts[key]
+            )
             self.mean_vals[key] = mean
         self.vals[key] = val
 
-    def _print_name(self) -> None:
-        """Print the name of the logger."""
-        if self.name:
-            self._print(self.name, end="", style=self.name_style)
-            # NOTE: Add clear line escape token to avoid overlapping
-            print("\x1B[0K")
-            self.log_lines += 1
+    def _build_name(self) -> Text:
+        """Build the name of the logger."""
+        return Text(text=self.name, style=self.name_style)
 
-    def _print_epoch_batch(self) -> None:
-        """Print epoch and batch info."""
+    def _build_epoch_batch(self) -> Text:
+        """Build a text containing epoch and batch info."""
         if self.n_batches is not None:
-            self._print(
+            return Text(
                 f"Epoch {self.current_epoch}/{self.n_epochs}, "
                 f"batch {self.current_batch}/{self.n_batches}",
-                end="",
             )
+        # Unknown number of batches
+        return Text(
+            f"Epoch {self.current_epoch}/{self.n_epochs}, "
+            f"batch {self.current_batch}",
+        )
+
+    def _build_bar(self) -> Text:
+        """Build a text containing a custom progress bar."""
+        if self.n_batches is not None:
+            progress = min(100, int(100 * self.current_batch / self.n_batches))
+            arrow_len = int(47 * progress / 100)
+            arrowhead = ">" if arrow_len < 47 else "="
+            return Text(
+                f"[{'=' * arrow_len}{arrowhead}{' ' * (47-arrow_len)}]"
+                f"[{progress:3d}%]",
+                overflow="ellipsis",
+            )
+        # NOTE: We don't know the number of batches, so we just print
+        # a bar that cycles every 20 log intervals or every 100 batches
+        # if log_interval is None.
+        if self.log_interval:
+            progress = (self.step // self.log_interval) % 20
+            arrow_len = int(54 * progress / 19)
         else:
-            self._print(
-                f"Epoch {self.current_epoch}/{self.n_epochs}, "
-                f"batch {self.current_batch}",
-                end="",
-            )
-        # NOTE: Add clear line escape token to avoid overlapping
-        print("\x1B[0K")
-        self.log_lines += 1
+            arrow_len = int(54 * (self.step % 100) / 99)
+        bar_list = [' '] * 54
+        for i in range(3):
+            bar_list[(arrow_len + i) % 54] = '●'
+        return Text(f"[{''.join(bar_list)}]", overflow="ellipsis")
 
-    def _print_bar(self) -> None:
-        """Print progress bar."""
-        if self.show_bar:
-            if self.n_batches is not None:
-                progress = min(100, int(100 * self.current_batch / self.n_batches))
-                arrow_len = int(47 * progress / 100)
-                arrowhead = ">" if arrow_len < 47 else "="
-                in_progress = "*" if progress < 100 else ""
-                self._print(
-                    f"[{'=' * arrow_len}{arrowhead}{'·' * (47-arrow_len)}]"
-                    f"[{progress}%{in_progress}]",
-                    sep="",
-                    end="",
-                    overflow="ellipsis",
-                )
-            else:
-                # NOTE: We don't know the number of batches, so we just print
-                # a bar that cycles every 20 log intervals
-                progress = (self.step // self.log_interval) % 20
-                arrow_len = int(53 * progress / 19)
-                arrowhead = "●"
-                self._print(
-                    f"[{'·' * arrow_len}{arrowhead}{'·' * (53-arrow_len)}]",
-                    end="",
-                    overflow="ellipsis",
-                )
+    def _build_time_info(self) -> Text:
+        """Build time info text."""
+        (delta_glob, delta_epoch, eta_glob, eta_epoch) = get_time_range(
+            current_time=time.time(),
+            start_glob=self.start_glob,
+            start_epoch=self.start_epoch,
+            current_epoch=self.current_epoch,
+            current_batch=self.current_batch,
+            n_epochs=self.n_epochs,
+            n_batches=self.n_batches,
+        )
+        delta_glob_str = sec_to_timestr(delta_glob)
+        delta_epoch_str = sec_to_timestr(delta_epoch)
+        eta_glob_str = sec_to_timestr(eta_glob) if eta_glob is not None else " ? "
+        eta_epoch_str = (
+            sec_to_timestr(eta_epoch) if eta_epoch is not None else " ? "
+        )
+        time_str = (
+            f"[global {delta_glob_str} < {eta_glob_str} | "
+            f"epoch {delta_epoch_str} < {eta_epoch_str}]"
+        )
+        return Text(time_str, overflow="ellipsis")
 
-            # NOTE: Add clear line escape token to avoid overlapping
-            print("\x1B[0K")
-            self.log_lines += 1
-
-    def _print_time_info(self) -> None:
-        """Print time info."""
-        if self.show_time:
-            (delta_glob, delta_epoch, eta_glob, eta_epoch) = get_time_range(
-                current_time=time.time(),
-                start_glob=self.start_glob,
-                start_epoch=self.start_epoch,
-                current_epoch=self.current_epoch,
-                current_batch=self.current_batch,
-                n_epochs=self.n_epochs,
-                n_batches=self.n_batches,
-            )
-            delta_glob_str = sec_to_timestr(delta_glob)
-            delta_epoch_str = sec_to_timestr(delta_epoch)
-            eta_glob_str = sec_to_timestr(eta_glob) if eta_glob is not None else " ? "
-            eta_epoch_str = (
-                sec_to_timestr(eta_epoch) if eta_epoch is not None else " ? "
-            )
-            time_str = (
-                f"\\[global {delta_glob_str} < {eta_glob_str} | "
-                f"epoch {delta_epoch_str} < {eta_epoch_str}]"
-            )
-
-            self._print(time_str, sep="", end="", overflow="ellipsis")
-            # NOTE: Add clear line escape token to avoid overlapping
-            print("\x1B[0K")
-            # Add the extra number of lines printed due to overflow
-            self.log_lines += 1 + len(time_str) // self._console.width
-
-    def _print_keys_vals(
+    def _build_keys_vals(
         self,
         values: Dict[str, VarType],
         *,
         styles: Union[Dict[str, str], str],
         digits: Union[Dict[str, int], int],
         average: Union[Dict[str, bool], bool],
-    ) -> None:
-        """Print the key and value."""
-        count = 0
-        line_len = 0
+    ) -> Group:
+        """Build a group of tables containing the keys and values."""
+        tables_list = [Table(show_header=False, show_edge=False)]
+        table_width = 0
+        row: List[Text] = []
         for key, val in values.items():
-            count += 1
-            # Get style, digits and average
+            # Get style, digits and average bool
             style = self._get_param(
-                key, styles, self.default_styles, default_value="white"
+                key, styles, self.default_styles, default_value='',
             )
             n_digit = self._get_param(key, digits, self.default_digits, default_value=6)
             avg = self._get_param(
                 key, average, self.default_average, default_value=False
             )
-            # Modify value
-            if isinstance(val, (int, float)):
+            # Format value and get average if needed
+            if isinstance(val, (int, float)) and not isinstance(val, bool):
                 if avg:
                     val = self.mean_vals[key]
                 val = str(val)[: int(n_digit)].ljust(int(n_digit))
-            # str_len: expected length of the string to be printed
-            str_len = len(key) + 2 + len(val)
-            if line_len + str_len > self._console.width:
-                # Go to next line
-                # NOTE: Add clear line escape token to avoid overlapping
-                print("\x1B[0K")
-                line_len = 0
-                self.log_lines += 1
-            if line_len != 0:
-                # Exists previous key-value pair in the line: add separator
-                self._print(" | ", end="")
-                str_len += 2
-            # Print key
-            if self.bold_keys:
-                self._print(key, style="bold " + str(style), end=": ", highlight=False)
-            else:
-                self._print(key, style=style, end=": ", highlight=False)
-            # Print value
-            self._print(val, style=style, end="", highlight=False)
-            line_len += str_len
-        # NOTE: Add clear line escape token to avoid overlapping
-        print("\x1B[0K")
-        self.log_lines += 1
+            # cell_width: expected length of the cell to be shown
+            cell_width = 3 + max(len(str(key)), len(str(val)))
+            # Create a new table when the current table is too wide
+            if table_width + cell_width > self.console.width:
+                tables_list[-1].add_row(*row)
+                tables_list.append(Table(show_header=False, show_edge=False))
+                table_width = 0
+                row = []
+            cell = Text(justify="center")
+            # Add key and value on the cell
+            key_style = str(style) + " bold" if self.bold_keys else style
+            cell.append(str(key), style=key_style)
+            cell.append('\n' + str(val), style=style)
+            row.append(cell)
+            table_width += cell_width
+        # Add the last row
+        tables_list[-1].add_row(*row)
+        return Group(*tables_list)
 
     @staticmethod
     def _get_param(
@@ -406,11 +423,6 @@ class Logger:
             config = default_value
         return config
 
-    def _print_message(self, message: Optional[str]) -> None:
-        """Print message."""
-        if message:
-            for line in message.split("\n"):
-                self._print(line, end="", highlight=False)
-                # NOTE: Add clear line escape token to avoid overlapping
-                print("\x1B[0K")
-            self.log_lines += 1 + message.count("\n")
+    def _build_message(self, message: str) -> Text:
+        """Build message."""
+        return Text(message, justify='left')

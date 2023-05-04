@@ -31,7 +31,8 @@ def test_logger() -> None:
                     {
                         "train loss": 1 - int(100 * epoch / n_epochs) / 100,
                         "train acc": 100 - int(100 * batch / n_batches) / 100,
-                        "mse": 0.2,
+                        "loss name": 'mse',
+                        "best run": True,
                     },
                     message="This is...\nok?",
                     styles=styles,
