@@ -7,8 +7,9 @@ pip install -e .
 pip install -r requirements-dev.txt
 ```
 
-Everyone can contribute to LogML, and we value everyone’s contributions.
-Please see our [contributing guidelines](CONTRIBUTING.md) for more information 🤗
+Everyone can contribute to LogML, and we value everyone’s contributions. Please see our
+[contributing guidelines](https://github.com/valentingol/logml/blob/main/CONTRIBUTING.md)
+for more information 🤗
 
 ## Todo list
 
