@@ -22,4 +22,4 @@ run.py
 # Setuptools SCM
 logml/_version.py
 # Docs
-html
+docs/_build
