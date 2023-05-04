@@ -8,9 +8,9 @@ LoggerML
 
 **Rich machine learning logger in the console.**
 
-Log your Machine Learning training in the console in a beautiful way
-using `rich <https://github.com/Textualize/rich>`__\ ✨ with useful
-information but with minimal code.
+Tired of watching a dull, unreadable or uninformative terminal screen
+all day long to monitor your ML training? Use LoggerML to brighten up
+your day in colour!
 
 Github project:
 `valentingol/logml <https://github.com/valentingol/logml>`__.
@@ -23,9 +23,12 @@ Github project:
 
 |Tests| |Coverage|
 
-Tired of watching a dull, unreadable or uninformative terminal screen
-all day long to monitor your ML training? Use LoggerML to brighten up
-your day in colour!
+Documentation version:
+|version|
+
+Log your Machine Learning training in the console in a beautiful way
+using `rich <https://github.com/Textualize/rich>`__\ ✨ with useful
+information but with minimal code.
 
 With only 3 short additional lines of code in your training loop you can
 get this:
