@@ -32,41 +32,34 @@ pip install loggerml
 
 ## Supported platforms
 
-This package assume that you are using a terminal that support ANSI escape sequences.
-See [here](https://en.wikipedia.org/wiki/ANSI_escape_code#Platform_support) for
-supported platforms. All Unix and Emacs distribution are supported as well as Windows
-but only on some machine (Windows 11 seems to work but not Windows 10).
+This package is supported on Linux, macOS and Windows.
 
-The quick test to know if your terminal support ANSI escape sequence is to run the
-following command in your terminal:
-
-```script
-python -c "print('\x1B')"
-```
-
-It should print an *empty* line.
+**Be careful, notebooks are not supported (but PR are welcome!).**
 
 ## Quick start
 
 ### Minimal usage
 
-Integrate the LogML logger in your training loops! For instance for 4 epochs,
-20 batches per epoch and a log interval of 2 batches:
+Integrate the LogML logger in your training loops! For instance for 4 epochs
+and 20 batches per epoch:
 
 ```python
+import time
+
 from logml import Logger
 
-logger = Logger(
-    n_epochs=4,
-    n_batches=20,
-    log_interval=2,
-)
+logger = Logger(n_epochs=4, n_batches=20)
+
 for _ in range(4):
-    logger.start_epoch()  # Indicate the start of a new epoch
+    logger.new_epoch()  # Indicate the start of a new epoch
     for _ in range(20):
-        logger.start_batch()  # Indicate the start of a new batch
-        # Log every 2 batches but you should call the log method at every batch
-        logger.log({'loss': 0.54321256, 'accuracy': 0.85244777})
+        logger.new_batch()  # Indicate the start of a new batch
+
+        time.sleep(0.1)  # Simulate a training step
+
+        # Log whatever you want (int, float, str, bool):
+        logger.log({'loss': 0.54321256, 'accuracy': 0.85244777, 'loss name': 'MSE',
+                    'improve baseline': True})
 ```
 
 Yields:
@@ -78,25 +71,43 @@ Yields:
 Now you can customize the logger with your own styles and colors. You can set the default configuration at the initialization of the logger and then you can override it during log. You can also log the averaged value over the epoch. For instance:
 
 ```python
-logger = Logger(
-    n_epochs=4,
+train_logger = Logger(
+    n_epochs=2,
     n_batches=20,
+    log_interval=2,
+    name='Training',
+    name_style='dark_orange',
     styles='yellow',
-    digits={'accuracy': 2},
+    digits={'accuracy': 4},
     average=['loss'],  # loss will be averaged over the current epoch
     bold_keys=True,
     show_time=False,  # Remove the time bar
 )
-for _ in range(4):
-    logger.start_epoch()
+val_logger = Logger(
+    n_epochs=2,
+    n_batches=10,
+    name='Validation',
+    name_style='cyan',
+    styles='blue',
+    bold_keys=True,
+    show_time=False,
+)
+for _ in range(2):
+    train_logger.new_epoch()
     for _ in range(20):
-        logger.start_batch()
+        train_logger.new_batch()
+        time.sleep(0.1)
         # Overwrite the default style for "loss" and add a message
-        logger.log(
+        train_logger.log(
             {'loss': 0.54321256, 'accuracy': 85.244777},
             styles={'loss': 'italic red'},
             message="Training is going well?\nYes!",
         )
+    val_logger.new_epoch()
+    for _ in range(10):
+        val_logger.new_batch()
+        time.sleep(0.1)
+        val_logger.log({'val loss': 0.65422135, 'val accuracy': 81.2658775})
 ```
 
 Yields:
@@ -116,15 +127,17 @@ The progress bar is replaced by a cyclic animation. The eta times are not know a
 Priority:
 
 - [ ] Doc with Sphinx
-- [ ] Be compatible with Windows and notebooks (with curses and some tricks)
+- [ ] Get back the cursor when interrupting the training
 
 Secondary:
 
+- [ ] Be compatible with notebooks
 - [ ] Explain how to use a tracker log (wandb for instance) with LogML
 - [ ] Use regex for `styles`, `digits` and `average` keys
 
 Done:
 
+- [x] Be compatible with Windows and Macs
 - [x] Manage a validation loop (then multiple loggers)
 - [ ] ~~Enable not using `new_epoch/log()` if log config is minimal~~
 - [x] Add color customization for message, epoch/batch number and time
