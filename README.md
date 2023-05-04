@@ -78,7 +78,7 @@ train_logger = Logger(
     name='Training',
     name_style='dark_orange',
     styles='yellow',
-    digits={'accuracy': 4},
+    sizes={'accuracy': 4},
     average=['loss'],  # loss will be averaged over the current epoch
     bold_keys=True,
     show_time=False,  # Remove the time bar
@@ -133,7 +133,7 @@ Secondary:
 
 - [ ] Be compatible with notebooks
 - [ ] Explain how to use a tracker log (wandb for instance) with LogML
-- [ ] Use regex for `styles`, `digits` and `average` keys
+- [ ] Use regex for `styles`, `sizes` and `average` keys
 
 Done:
 
