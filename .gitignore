@@ -21,3 +21,5 @@ tests/tmp
 run.py
 # Setuptools SCM
 logml/_version.py
+# Docs
+html
