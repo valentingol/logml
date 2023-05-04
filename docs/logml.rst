@@ -1,4 +1,4 @@
-Logml
+Logml API
 =============
 
 logml.logger
