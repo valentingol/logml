@@ -28,9 +28,9 @@ extensions = [
     "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
-    "sphinx.ext.inheritance_diagram",
-    "sphinx.ext.intersphinx",
-    "sphinx_autodoc_typehints",
+    # "sphinx.ext.inheritance_diagram",
+    # "sphinx.ext.intersphinx",
+    # "sphinx_autodoc_typehints",
 ]
 
 master_doc = "index"
