@@ -3,14 +3,79 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to LoggerML's doc!
-==========================
+LoggerML
+========
+
+**Rich machine learning logger in the console.**
+
+Log your Machine Learning training in the console in a beautiful way
+using `rich <https://github.com/Textualize/rich>`__\ ✨ with useful
+information but with minimal code.
+
+Github project:
+`valentingol/logml <https://github.com/valentingol/logml>`__.
+
+|PyPI version| |PythonVersion| |License|
+
+|Ruff_logo| |Black_logo|
+
+|Ruff| |Flake8| |Pydocstyle| |MyPy| |PyLint|
+
+|Tests| |Coverage|
+
+Tired of watching a dull, unreadable or uninformative terminal screen
+all day long to monitor your ML training? Use LoggerML to brighten up
+your day in colour!
+
+With only 3 short additional lines of code in your training loop you can
+get this:
+
+.. figure:: _static/base.png
+   :alt: Alt text
+
+   Alt text
+
+And you can simply customize your display to your liking, for instance
+like this:
+
+.. figure:: _static/advanced.png
+   :alt: Alt text
+
+   Alt text
+
+The logger provides also the possibility to average the logged values
+over an epoch or a full training.
+
+.. |PyPI version| image:: https://badge.fury.io/py/loggerml.svg
+   :target: https://badge.fury.io/py/loggerml
+.. |PythonVersion| image:: https://img.shields.io/badge/python-3.7%20%7E%203.11-informational
+.. |License| image:: https://img.shields.io/github/license/valentingol/logml?color=999
+   :target: https://stringfixer.com/fr/MIT_license
+.. |Ruff_logo| image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v1.json
+   :target: https://github.com/charliermarsh/ruff
+.. |Black_logo| image:: https://img.shields.io/badge/code%20style-black-000000.svg
+   :target: https://github.com/psf/black
+.. |Ruff| image:: https://github.com/valentingol/logml/actions/workflows/ruff.yaml/badge.svg
+   :target: https://github.com/valentingol/logml/actions/workflows/ruff.yaml
+.. |Flake8| image:: https://github.com/valentingol/logml/actions/workflows/flake.yaml/badge.svg
+   :target: https://github.com/valentingol/logml/actions/workflows/flake.yaml
+.. |Pydocstyle| image:: https://github.com/valentingol/logml/actions/workflows/pydocstyle.yaml/badge.svg
+   :target: https://github.com/valentingol/logml/actions/workflows/pydocstyle.yaml
+.. |MyPy| image:: https://github.com/valentingol/logml/actions/workflows/mypy.yaml/badge.svg
+   :target: https://github.com/valentingol/logml/actions/workflows/mypy.yaml
+.. |PyLint| image:: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/valentingol/451f91cece4478ebc81377e27e432f8b/raw/logml_pylint.json
+   :target: https://github.com/valentingol/logml/actions/workflows/pylint.yaml
+.. |Tests| image:: https://github.com/valentingol/logml/actions/workflows/tests.yaml/badge.svg
+   :target: https://github.com/valentingol/logml/actions/workflows/tests.yaml
+.. |Coverage| image:: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/valentingol/451f91cece4478ebc81377e27e432f8b/raw/logml_tests.json
+   :target: https://github.com/valentingol/logml/actions/workflows/tests.yaml
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :caption: Contents:
-   README.rst
-   installation.md
-   quickstart.md
-   core
-   license.md
+
+   installation
+   quickstart
+   logml
+   contribute
+   license
