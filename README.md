@@ -1,5 +1,5 @@
 
-# LoggerML - Machine Learning Logger in the console
+# LoggerML - Rich machine learning logger in the console
 
 Log your Machine Learning training in the console in a beautiful way using
 [rich](https://github.com/Textualize/rich)✨ with useful information but with
@@ -64,11 +64,13 @@ for _ in range(4):
 
 Yields:
 
-![Alt Text](assets/base.gif)
+![Alt Text](docs/_static/base.gif)
 
 ### Advanced usage
 
-Now you can customize the logger with your own styles and colors. You can set the default configuration at the initialization of the logger and then you can override it during log. You can also log the averaged value over the epoch. For instance:
+Now you can customize the logger with your own styles and colors. You can set the
+default configuration at the initialization of the logger and then you can override
+it during log. You can also log the averaged value over the epoch. For instance:
 
 ```python
 train_logger = Logger(
@@ -112,15 +114,18 @@ for _ in range(2):
 
 Yields:
 
-![Alt Text](assets/advanced.gif)
+![Alt Text](docs/_static/advanced.gif)
 
 ### Don't know the number of batches in advance?
 
-If you don't have the number of batches in advance, you can initialize the logger with `n_batches=None`. Only the available information will be displayed. For instance with the configuration of the first example:
+If you don't have the number of batches in advance, you can initialize the logger
+with `n_batches=None`. Only the available information will be displayed. For instance
+with the configuration of the first example:
 
-![Alt Text](assets/no_n_batches.png)
+![Alt Text](docs/_static/no_n_batches.png)
 
-The progress bar is replaced by a cyclic animation. The eta times are not know at the first epoch but was estimated after the second epoch.
+The progress bar is replaced by a cyclic animation. The eta times are not know at the
+first epoch but was estimated after the second epoch.
 
 ## Todo
 

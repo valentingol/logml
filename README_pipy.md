@@ -1,5 +1,5 @@
 
-# LoggerML - Machine Learning Logger in the console
+# LoggerML - Rich machine learning logger in the console
 
 Log your Machine Learning training in the console in a beautiful way using
 [rich](https://github.com/Textualize/rich)✨ with useful information but with
@@ -150,7 +150,7 @@ Epoch 1/2, batch 3/10
 ```
 
 With colors! See the gif
-[here](https://github.com/valentingol/logml/blob/main/assets/advanced.gif).
+[here](https://github.com/valentingol/logml/blob/main/docs/_static/advanced.gif).
 
 ### Don't know the number of batches in advance?
 
