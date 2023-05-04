@@ -33,15 +33,11 @@ get this:
 .. figure:: _static/base.png
    :alt: Alt text
 
-   Alt text
-
 And you can simply customize your display to your liking, for instance
 like this:
 
 .. figure:: _static/advanced.png
    :alt: Alt text
-
-   Alt text
 
 The logger provides also the possibility to average the logged values
 over an epoch or a full training.

@@ -5,6 +5,10 @@ Log your Machine Learning training in the console in a beautiful way using
 [rich](https://github.com/Textualize/rich)✨ with useful information but with
 minimal code.
 
+## Documentation [here :memo:](https://logml.readthedocs.io/en/latest/)
+
+---
+
 [![PyPI version](https://badge.fury.io/py/loggerml.svg)](https://badge.fury.io/py/loggerml)
 ![PythonVersion](https://img.shields.io/badge/python-3.7%20%7E%203.11-informational)
 [![License](https://img.shields.io/github/license/valentingol/logml?color=999)](https://stringfixer.com/fr/MIT_license)
@@ -20,6 +24,7 @@ minimal code.
 
 [![Tests](https://github.com/valentingol/logml/actions/workflows/tests.yaml/badge.svg)](https://github.com/valentingol/logml/actions/workflows/tests.yaml)
 [![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/valentingol/451f91cece4478ebc81377e27e432f8b/raw/logml_tests.json)](https://github.com/valentingol/logml/actions/workflows/tests.yaml)
+[![Documentation Status](https://readthedocs.org/projects/logml/badge/?version=latest)](https://logml.readthedocs.io/en/latest/?badge=latest)
 
 ## Installation
 
