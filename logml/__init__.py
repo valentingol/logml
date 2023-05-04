@@ -12,7 +12,6 @@ Copyright (C) 2023  Valentin Goldité
     include as well as this copy right notice.
 """
 # pylint: disable=wrong-import-position
-import atexit
 
 from rich.console import Console
 
