@@ -23,18 +23,18 @@ except:  # noqa E722
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-# Add napoleon to the extensions list
 extensions = [
     "myst_parser",
     "sphinx.ext.autodoc",
-    "sphinx.ext.napoleon",
     "sphinx.ext.inheritance_diagram",
     "sphinx.ext.intersphinx",
+    "sphinx.ext.napoleon",
     "sphinx_autodoc_typehints",
 ]
 
 master_doc = "index"
-autoapi_dirs = ["../logml"]
+autoapi_type = 'python'
+autoapi_dirs = ["logml"]
 
 autodoc_default_options = {
     "member-order": "bysource",
@@ -78,6 +78,6 @@ html_context = {
     "display_github": True,  # Integrate GitHub
     "github_user": "valentingol",  # Username
     "github_repo": "LoggerML",  # Repo name
-    "github_version": "dev",  # Version
+    "github_version": "main",  # Version
     "conf_py_path": "/docs/",  # Path in the checkout to the docs root
 }
