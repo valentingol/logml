@@ -13,7 +13,7 @@ def main() -> None:
         n_epochs=n_epochs,
         n_batches=n_batches,
         log_interval=2,
-        digits={"train acc": 2},
+        sizes={"train acc": 2},
         styles="yellow",
         average=["train loss"],
         bold_keys=True,
@@ -44,7 +44,7 @@ def main() -> None:
     logger.log(
         {f"new loss{i}": 0.3 for i in range(1, 20)},
         styles="red",
-        digits=3,
+        sizes=3,
         message="\n",
     )
 

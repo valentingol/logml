@@ -5,7 +5,7 @@ Log your Machine Learning training in the console in a beautiful way using
 [rich](https://github.com/Textualize/rich)✨ with useful information but with
 minimal code.
 
-[![Release](https://img.shields.io/github/v/release/valentingol/logml?include_prereleases)](https://github.com/valentingol/logml/releases)
+[![PyPI version](https://badge.fury.io/py/loggerml.svg)](https://badge.fury.io/py/loggerml)
 ![PythonVersion](https://img.shields.io/badge/python-3.7%20%7E%203.11-informational)
 [![License](https://img.shields.io/github/license/valentingol/logml?color=999)](https://stringfixer.com/fr/MIT_license)
 
@@ -78,7 +78,7 @@ train_logger = Logger(
     name='Training',
     name_style='dark_orange',
     styles='yellow',
-    digits={'accuracy': 4},
+    sizes={'accuracy': 4},
     average=['loss'],  # loss will be averaged over the current epoch
     bold_keys=True,
     show_time=False,  # Remove the time bar
@@ -133,7 +133,7 @@ Secondary:
 
 - [ ] Be compatible with notebooks
 - [ ] Explain how to use a tracker log (wandb for instance) with LogML
-- [ ] Use regex for `styles`, `digits` and `average` keys
+- [ ] Use regex for `styles`, `sizes` and `average` keys
 
 Done:
 

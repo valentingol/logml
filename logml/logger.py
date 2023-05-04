@@ -30,22 +30,22 @@ class Logger:
         Name of the logger. It will be display at the top of the logs.
         By default None (no name).
     styles : Union[Dict, str], optional
-        Default style of the values. These styles can be set or
-        overwritten in the log method. Include color, bold, italic and more
+        Default style of the values. Include color, bold, italic and more
         See https://rich.readthedocs.io/en/stable/style.html for more details.
         E.g. {'loss': 'bold red', 'acc': 'italic #af00ff'}
         Use a single string to apply the same style to all values.
+        These styles can also be set or overwritten in the log method.
         By default 'white'.
-    digits : Union[Dict, int], optional
-        Default number of digits to display for each numerical values.
-        Note that the dot is counted as a digit.
-        These numbers can be set or overwritten in the log method.
+    sizes : Union[Dict, int], optional
+        Default sizes to display for each numerical values.
+        Note that the dot is counted as a character.
         E.g. {'loss': 3, 'acc': 2}.
-        Use a single int to apply the same number of digits to all values.
+        Use a single int to apply the same size to all values.
+        These numbers can also be set or overwritten in the log method.
         By default 6.
     average : Optional[List[str]], optional
         Default list of the values to average over the epoch.
-        This can be overwritten in the log method.
+        This can also be overwritten in the log method.
         By default None.
     silent : bool, optional
         Whether to print the logs or not. By default False.
@@ -67,7 +67,7 @@ class Logger:
         name: Optional[str] = None,
         *,
         styles: Union[Dict, str] = "white",
-        digits: Union[Dict, int] = 6,
+        sizes: Union[Dict, int] = 6,
         average: Optional[List[str]] = None,
         silent: bool = False,
         show_bar: bool = True,
@@ -83,7 +83,7 @@ class Logger:
         # Default configs
         self.name_style = name_style
         self.default_styles = styles
-        self.default_digits = digits
+        self.default_sizes = sizes
         self.default_average: Dict = {key: True for key in average} if average else {}
         self.bold_keys = bold_keys
         # Internal variables
@@ -201,7 +201,7 @@ class Logger:
         *,
         message: Optional[str] = None,
         styles: Union[Dict[str, str], str, None] = None,
-        digits: Union[Dict[str, int], int, None] = None,
+        sizes: Union[Dict[str, int], int, None] = None,
         average: Optional[List[str]] = None,
     ) -> None:
         """Log the values with style.
@@ -218,10 +218,10 @@ class Logger:
             E.g. {'loss': 'bold red', 'acc': 'italic #af00ff'}
             Use a single string to apply the same style to all values.
             By default None (use the default style).
-        digits : Union[Dict, int], optional
-            Number of digits to display for each numerical values.
+        sizes : Union[Dict, int], optional
+            Size of the values to display for each numerical values.
             E.g. {'loss': 3, 'acc': 2}.
-            Use a single int to apply the same number of digits to all values.
+            Use a single int to apply the same size to all values.
             By default None (use the default style).
         average : Optional[List[str]], optional
             List of the values to average over the epoch.
@@ -256,7 +256,7 @@ class Logger:
             vals_table = self._build_keys_vals(
                 values,
                 styles=styles,  # type: ignore
-                digits=digits,  # type: ignore
+                sizes=sizes,  # type: ignore
                 average=average_dict,
             )
             renderables.append(vals_table)
@@ -362,7 +362,7 @@ class Logger:
         values: Dict[str, VarType],
         *,
         styles: Union[Dict[str, str], str],
-        digits: Union[Dict[str, int], int],
+        sizes: Union[Dict[str, int], int],
         average: Union[Dict[str, bool], bool],
     ) -> Group:
         """Build a group of tables containing the keys and values."""
@@ -370,11 +370,11 @@ class Logger:
         table_width = 0
         row: List[Text] = []
         for key, val in values.items():
-            # Get style, digits and average bool
+            # Get style, size and average bool
             style = self._get_param(
                 key, styles, self.default_styles, default_value='',
             )
-            n_digit = self._get_param(key, digits, self.default_digits, default_value=6)
+            size = self._get_param(key, sizes, self.default_sizes, default_value=6)
             avg = self._get_param(
                 key, average, self.default_average, default_value=False
             )
@@ -382,7 +382,7 @@ class Logger:
             if isinstance(val, (int, float)) and not isinstance(val, bool):
                 if avg:
                     val = self.mean_vals[key]
-                val = str(val)[: int(n_digit)].ljust(int(n_digit))
+                val = str(val)[: int(size)].ljust(int(size))
             # cell_width: expected length of the cell to be shown
             cell_width = 3 + max(len(str(key)), len(str(val)))
             # Create a new table when the current table is too wide

@@ -5,7 +5,7 @@ Log your Machine Learning training in the console in a beautiful way using
 [rich](https://github.com/Textualize/rich)✨ with useful information but with
 minimal code.
 
-[![Release](https://img.shields.io/github/v/release/valentingol/logml?include_prereleases)](https://github.com/valentingol/logml/releases)
+[![PyPI version](https://badge.fury.io/py/loggerml.svg)](https://badge.fury.io/py/loggerml)
 ![PythonVersion](https://img.shields.io/badge/python-3.7%20%7E%203.11-informational)
 [![License](https://img.shields.io/github/license/valentingol/logml?color=999)](https://stringfixer.com/fr/MIT_license)
 
@@ -99,7 +99,7 @@ train_logger = Logger(
     name='Training',
     name_style='dark_orange',
     styles='yellow',  # Default style for all values
-    digits={'accuracy': 4},  # only 4 characters for 'accuracy'
+    sizes={'accuracy': 4},  # only 4 characters for 'accuracy'
     average=['loss'],  # 'loss' will be averaged over the current epoch
     bold_keys=True,  # Bold the keys
     show_time=False,  # Remove the time bar

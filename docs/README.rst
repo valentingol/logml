@@ -88,7 +88,7 @@ value over the epoch. For instance:
        n_epochs=4,
        n_batches=20,
        styles='yellow',
-       digits={'accuracy': 2},
+       sizes={'accuracy': 2},
        average=['loss'],  # loss will be averaged over the current epoch
        bold_keys=True,
        show_time=False,  # Remove the time bar
@@ -138,7 +138,7 @@ Priority:
 Secondary:
 
 -  ☐ Explain how to use a tracker log (wandb for instance) with LogML
--  ☐ Use regex for ``styles``, ``digits`` and ``average`` keys
+-  ☐ Use regex for ``styles``, ``sizes`` and ``average`` keys
 
 Done:
 
