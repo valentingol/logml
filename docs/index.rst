@@ -23,9 +23,6 @@ Github project:
 
 |Tests| |Coverage|
 
-Documentation version:
-|version|
-
 Log your Machine Learning training in the console in a beautiful way
 using `rich <https://github.com/Textualize/rich>`__\ ✨ with useful
 information but with minimal code.
