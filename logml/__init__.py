@@ -11,7 +11,15 @@ Copyright (C) 2023  Valentin Goldité
     DISTRIBUTION and PRIVATE USE as long as the original license is
     include as well as this copy right notice.
 """
-from logml._version import __version__, __version_tuple__
-from logml.logger import Logger
+# pylint: disable=wrong-import-position
+import atexit
 
-__all__ = ["__version__", "__version_tuple__", "Logger"]
+from rich.console import Console
+
+from logml._version import __version__, __version_tuple__
+
+RICH_CONSOLE = Console()
+
+from logml.logger import Logger  # noqa: E402
+
+__all__ = ["__version__", "__version_tuple__", "Logger", 'RICH_CONSOLE']
