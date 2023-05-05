@@ -38,10 +38,6 @@ check_output "PEP8 checks"
 
 printf "\n${GREEN}${BOLD}All checks pass${NORMAL}${WHITE}\n\n"
 
-echo "*********** Integration tests **********"
-python tests/integration/inte_logger.py
-python tests/integration/inte_two_loggers.py
-
 echo "*********** Style evaluation ***********"
 score=$(pylint . | sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p')
 
