@@ -94,7 +94,6 @@ train_logger = Logger(
     sizes={'accuracy': 4},  # only 4 characters for 'accuracy'
     average=['loss'],  # 'loss' will be averaged over the current epoch
     bold_keys=True,  # Bold the keys
-    show_time=False,  # Remove the time bar
 )
 val_logger = Logger(
     n_epochs=2,
@@ -103,7 +102,7 @@ val_logger = Logger(
     name_style='cyan',
     styles='blue',
     bold_keys=True,
-    show_time=False,
+    show_time=False,  # Remove the time bar
 )
 for _ in range(2):
     train_logger.new_epoch()  # Manually declare a new epoch
@@ -138,6 +137,9 @@ with the configuration of the first example:
 
 The progress bar is replaced by a cyclic animation. The eta times are not know at the
 first epoch but was estimated after the second epoch.
+
+Note that if you use `Logger.tqdm(dataset)` and the dataset has a length, the number of
+batches will be automatically set to the length of the dataset.
 
 ## How to contribute
 

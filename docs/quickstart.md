@@ -54,7 +54,6 @@ train_logger = Logger(
     sizes={'accuracy': 4},  # only 4 characters for 'accuracy'
     average=['loss'],  # 'loss' will be averaged over the current epoch
     bold_keys=True,  # Bold the keys
-    show_time=False,  # Remove the time bar
 )
 val_logger = Logger(
     n_epochs=2,
@@ -63,7 +62,7 @@ val_logger = Logger(
     name_style='cyan',
     styles='blue',
     bold_keys=True,
-    show_time=False,
+    show_time=False,  # Remove the time bar
 )
 for _ in range(2):
     train_logger.new_epoch()  # Manually declare a new epoch
@@ -87,3 +86,5 @@ for _ in range(2):
 Yields:
 
 ![Alt Text](_static/advanced.gif)
+
+Further features are described in the *Features* section.
