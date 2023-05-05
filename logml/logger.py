@@ -59,6 +59,25 @@ class Logger:
         Whether to bold the key or not. By default False.
     name_style: str, optional
         Style of the name. By default, use the rich default style.
+
+    Attributes
+    ----------
+    step : int
+        Number of batches seen since the beginning.
+    current_epoch : int
+        Current epoch number (starting at 1).
+    current_batch : int
+        Current batch number (starting at 1).
+    vals : Dict[str, VarType]
+        Last values called inside log (not averaged or resized).
+    mean_vals : Dict[str, VarType]
+        Current mean values.
+    live : Live
+        Rich live display of the logger.
+    renderable : Optional[Group]
+        Rich renderable object corresponding to live display.
+    console : Console
+        Rich console object use by the logger.
     """
 
     def __init__(
