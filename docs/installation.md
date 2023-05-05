@@ -7,8 +7,5 @@ In a new virtual environment, install simply the package via
 pip install loggerml
 ```
 
-## Supported platforms
-
 This package is supported on Linux, macOS and Windows.
-
-**Be careful, notebooks are not supported (but PR are welcome!).**
+It is also supported on Jupyter Notebooks.
