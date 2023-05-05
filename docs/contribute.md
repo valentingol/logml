@@ -15,17 +15,18 @@ for more information 🤗
 
 Priority:
 
-- [ ] Get back the cursor when interrupting the training
-- [ ] `logger.tqdm()` feature (used like `tqdm.tqdm`)
+- [ ] Finalize tests for 1.0.0 major release
 
 Secondary:
 
-- [ ] Be compatible with notebooks
-- [ ] Explain how to use a tracker log (wandb for instance) with LogML
-- [ ] Use regex for `styles`, `sizes` and `average` keys
-
 Done:
 
+- [x] Add docs sections: comparison with tqdm and how to use mean_vals
+  (with exp tracker)
+- [x] Use regex for `styles`, `sizes` and `average` keys
+- [x] Be compatible with notebooks
+- [x] Get back the cursor when interrupting the training
+- [x] `logger.tqdm()` feature (used like `tqdm.tqdm`)
 - [x] Doc with Sphinx
 - [x] Be compatible with Windows and Macs
 - [x] Manage a validation loop (then multiple loggers)

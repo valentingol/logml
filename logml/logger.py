@@ -1,5 +1,6 @@
 """Logger class."""
 import atexit
+import re
 import time
 from typing import Any, Dict, Iterable, List, Optional, Union
 
@@ -25,7 +26,8 @@ class Logger:
     n_batches : Optional[int]
         Number of batches per epoch. Set to None if not available.
     log_interval : int, optional
-        Number of batches between each log. By default 1.
+        Number of batches between each log. None for 4 update per second.
+        By default 1.
     name: Optional[str], optional
         Name of the logger. It will be display at the top of the logs.
         By default None (no name).
@@ -66,14 +68,14 @@ class Logger:
         log_interval: Optional[int] = 1,
         name: Optional[str] = None,
         *,
-        styles: Union[Dict, str] = "",
+        styles: Union[Dict, str] = '',
         sizes: Union[Dict, int] = 6,
         average: Optional[List[str]] = None,
         silent: bool = False,
         show_bar: bool = True,
         show_time: bool = True,
         bold_keys: bool = False,
-        name_style: Optional[str] = None,
+        name_style: str = '',
     ) -> None:
         # Log parameters
         self.silent = silent
@@ -456,23 +458,36 @@ class Logger:
     def _get_param(
         key: str,
         log_configs: Union[DictVarType, VarType, None],
-        default_configs: Union[VarType, Dict[str, VarType]],
+        default_configs: Union[DictVarType, VarType],
         *,
         default_value: VarType,
     ) -> VarType:
         """Get the parameter for the key on log_configs or default_configs."""
         if isinstance(log_configs, (int, float, str, bool)):
-            config = log_configs
-        elif log_configs and key in log_configs:
-            config = log_configs[key]
-        elif not isinstance(default_configs, Dict):
-            config = default_configs
-        elif isinstance(default_configs, Dict) and key in default_configs:
-            config = default_configs[key]
-        else:
-            config = default_value
-        return config
+            return log_configs
+        if log_configs is not None:  # logs_configs is a dict
+            val = _regex_looking(key, log_configs)
+            if val:
+                return val
+        # logs_configs is None => use default_configs
+        if isinstance(default_configs, (int, float, str, bool)):
+            return default_configs
+        val = _regex_looking(key, default_configs)
+        if val:
+            return val
+        return default_value
 
     def _build_message(self, message: str) -> Text:
         """Build message."""
         return Text(message, justify='left')
+
+
+def _regex_looking(key: str, config: DictVarType) -> Optional[VarType]:
+    """Look on config (dict) for pattern matching and return the value."""
+    if key in config:
+        return config[key]
+    val = None
+    for pattern in config:
+        if re.match(pattern, key):
+            val = config[pattern]
+    return val
