@@ -231,6 +231,32 @@ class Logger:
         )
         self.renderable = None
 
+    def get_vals(self, *, average: Optional[List[str]] = None) -> Dict[str, VarType]:
+        """Get the last values called with log, optionally averaged.
+
+        Parameters
+        ----------
+        average : List[str], optional
+            List of keys to return average. Support regex expressions.
+            None for no averaged value. By default None.
+
+        Returns
+        -------
+        Dict[str, VarType]
+            Last values called with log (optionally averaged).
+        """
+        if average is None:
+            average = []
+        vals = self.vals.copy()
+        for key in vals:
+            if key in average:
+                vals[key] = self.mean_vals[key]
+            else:
+                for pattern in average:
+                    if re.match(pattern, key):
+                        vals[key] = self.mean_vals[key]
+        return vals
+
     def _prelog_check(self) -> None:
         """Check if the logger is ready to log."""
         err_message = ""
