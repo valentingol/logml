@@ -60,8 +60,17 @@ class Logger:
     name_style: str, optional
         Style of the name. By default, use the rich default style.
 
-    Attributes
-    ----------
+    Examples
+    --------
+    ::
+
+        logger = Logger(n_epochs=10, n_batches=100)
+        for _ in range(10):
+            for _ in logger.tqdm(range(100)):
+                logger.log(loss=0.5, acc=0.9)
+
+    Attribute
+    ---------
     step : int
         Number of batches seen since the beginning.
     current_epoch : int
@@ -72,12 +81,6 @@ class Logger:
         Last values called inside log (not averaged or resized).
     mean_vals : Dict[str, VarType]
         Current mean values.
-    live : Live
-        Rich live display of the logger.
-    renderable : Optional[Group]
-        Rich renderable object corresponding to live display.
-    console : Console
-        Rich console object use by the logger.
     """
 
     def __init__(
@@ -117,6 +120,8 @@ class Logger:
         self.t_epoch = 0.0
         self.current_epoch = 0
         self.current_batch = 0
+        self._on_tqdm = False
+        self._just_new_epoch = False
         # Internal values
         self.vals: Dict = {}  # Last vals called inside log
         self._counts: Dict = {}
@@ -131,166 +136,6 @@ class Logger:
         self.renderable = None
         self.console = RICH_CONSOLE
         atexit.register(self.stop)
-
-    def tqdm(
-        self,
-        iterable: Iterable,
-        *,
-        reset_means: bool = True,
-    ) -> Any:
-        """Browse an iterable dataset and automatically update the epoch and batch.
-
-        No need to explicitly call `new_epoch` or `new_batch` as they are
-        automatically called. If n_batches is not specified and the iterable
-        implement a __len__ attribute, the number of batch is inferred
-        and store in self.n_batches.
-
-        Parameters
-        ----------
-        iterable : Iterable
-            Iterable dataset.
-        reset_means: bool, optional
-            Whether to reset the computed mean values at the start of the epoch.
-            By default True.
-        """
-        if self.n_batches is None and hasattr(iterable, "__len__"):
-            self.n_batches = len(iterable)  # type: ignore
-        self.new_epoch(reset_means=reset_means)
-        for batch in iterable:
-            self.new_batch()
-            yield batch
-        self.detach()
-
-    def new_epoch(
-        self,
-        *,
-        reset_means: bool = True,
-    ) -> None:
-        """Declare a new epoch.
-
-        Parameters
-        ----------
-        reset_means: bool, optional
-            Whether to reset the computed mean values at the start of the epoch.
-            By default True.
-        """
-        self.live = Live(
-            renderable=None,
-            console=RICH_CONSOLE,
-            refresh_per_second=4,
-            auto_refresh=False,
-        )
-        self.renderable = None
-        self.t_epoch = time.time()
-        # Avoid updating the epoch if no new batch has been declared.
-        if self.current_epoch == 0 or self.current_batch != 0:
-            self.current_epoch += 1
-        self.current_batch = 0
-        if reset_means:
-            self._counts = {key: 0 for key in self._counts}
-            self.mean_vals = {key: 0 for key in self.mean_vals}
-        # "Detach" the logs from the previous epoch
-        self.detach()
-        # Start the new live display
-        self.live.start()
-
-    def start_epoch(self, *, reset_means: bool = True) -> None:
-        """Declare a new epoch. Alias for `new_epoch`."""
-        self.new_epoch(reset_means=reset_means)
-
-    def new_batch(self) -> None:
-        """Declare a new batch."""
-        self.step += 1
-        self.current_batch += 1
-
-    def start_batch(self) -> None:
-        """Declare a new batch. Alias for `new_batch`."""
-        self.new_batch()
-
-    def detach(self, *, skipline: bool = True) -> None:
-        """Stop the live display.
-
-        Stop the live display while keeping the current display visible in
-        the terminal.
-        """
-        if self.console._live is not None:  # pylint: disable=protected-access
-            self.console._live.stop()  # pylint: disable=protected-access
-            self.console.clear_live()
-        if not self.silent and skipline:
-            self.console.print('')
-
-    def stop(self) -> None:
-        """Stop the live display.
-
-        Stop the live display while keeping the current display visible in
-        the terminal. Alias for `detach(skipline=False)`.
-        """
-        self.detach(skipline=False)
-
-    def start(self) -> None:
-        """Set the start time of the training (already called at initialization)."""
-        self.t_glob = time.time()
-
-    def reset(self) -> None:
-        """Reset the logger as at initialization."""
-        self.stop()
-        self.step = 0
-        self.t_glob = time.time()
-        self.t_epoch = 0.0
-        self.current_epoch = 0
-        self.current_batch = 0
-        self.vals = {}
-        self.mean_vals = {}
-        self._counts = {}
-        self.live = Live(
-            renderable=None,
-            console=RICH_CONSOLE,
-            refresh_per_second=4,
-            auto_refresh=False,
-        )
-        self.renderable = None
-
-    def get_vals(self, *, average: Optional[List[str]] = None) -> Dict[str, VarType]:
-        """Get the last values called with log, optionally averaged.
-
-        Parameters
-        ----------
-        average : List[str], optional
-            List of keys to return average. Support regex expressions.
-            None for no averaged value. By default None.
-
-        Returns
-        -------
-        Dict[str, VarType]
-            Last values called with log (optionally averaged).
-        """
-        if average is None:
-            average = []
-        vals = self.vals.copy()
-        for key in vals:
-            if key in average:
-                vals[key] = self.mean_vals[key]
-            else:
-                for pattern in average:
-                    if re.match(pattern, key):
-                        vals[key] = self.mean_vals[key]
-        return vals
-
-    def _prelog_check(self) -> None:
-        """Check if the logger is ready to log."""
-        err_message = ""
-        if self.current_epoch == 0:
-            err_message += (
-                "You must indicate a new epoch before logging "
-                "with `logger.new_epoch()` at start of the epoch.\n"
-            )
-        if self.current_batch == 0:
-            err_message += (
-                "You must indicate a new batch before logging "
-                "with `logger.new_batch()` just after batch loading.\n"
-            )
-        if err_message:
-            raise ValueError(err_message)
 
     def log(
         self,
@@ -312,12 +157,18 @@ class Logger:
         styles : Union[Dict, str, None], optional
             Style of the values. Include color, bold, italic and more
             See https://rich.readthedocs.io/en/stable/style.html for more details.
-            E.g. {'loss': 'bold red', 'acc': 'italic #af00ff'}
+            E.g.::
+
+                {'loss': 'bold red', 'acc': 'italic #af00ff'}
+
             Use a single string to apply the same style to all values.
             By default None (use the default style).
         sizes : Union[Dict, int], optional
             Size of the values to display for each numerical values.
-            E.g. {'loss': 3, 'acc': 2}.
+            E.g.::
+
+                {'loss': 7, 'acc': 2}
+
             Use a single int to apply the same size to all values.
             By default None (use the default style).
         average : Optional[List[str]], optional
@@ -375,6 +226,193 @@ class Logger:
         )
         self.live.update(renderable=self.renderable, refresh=refresh)
 
+    def tqdm(
+        self,
+        iterable: Iterable,
+        *,
+        reset_means: bool = True,
+    ) -> Any:
+        """Browse an iterable dataset and automatically update the epoch and batch.
+
+        No need to explicitly call :meth:`new_epoch` or :meth:`new_batch` as
+        they are automatically called. If :attr:`n_batches` is not specified and
+        the iterable implement a `__len__` attribute, the number of batch is
+        inferred and store in :attr:`n_batches`.
+
+        Parameters
+        ----------
+        iterable : Iterable
+            Iterable dataset.
+        reset_means: bool, optional
+            Whether to reset the computed mean values at the start of the epoch.
+            By default True.
+        """
+        if self.n_batches is None and hasattr(iterable, "__len__"):
+            self.n_batches = len(iterable)  # type: ignore
+        self.new_epoch(reset_means=reset_means)
+        for batch in iterable:
+            self.new_batch()
+            self._on_tqdm = True
+            yield batch
+            self._on_tqdm = False
+        self.stop()
+
+    def new_epoch(
+        self,
+        *,
+        reset_means: bool = True,
+    ) -> None:
+        """Declare a new epoch.
+
+        Parameters
+        ----------
+        reset_means: bool, optional
+            Whether to reset the computed mean values at the start of the epoch.
+            By default True.
+        """
+        if self._just_new_epoch:
+            return
+        self._just_new_epoch = True
+        # Reset internal variables
+        if reset_means:
+            self._counts = {key: 0 for key in self._counts}
+            self.mean_vals = {key: 0 for key in self.mean_vals}
+        self.live = Live(
+            renderable=None,
+            console=RICH_CONSOLE,
+            refresh_per_second=4,
+            auto_refresh=False,
+        )
+        self.renderable = None
+        # "Detach" the logs from the previous epoch
+        self.detach()
+        # Update epoch and batch
+        self.current_epoch += 1
+        self.current_batch = 0
+        # Start the new live display
+        self.live.start()
+        # Set the new epoch start time
+        self.t_epoch = time.time()
+
+    def start_epoch(self, *, reset_means: bool = True) -> None:
+        """Declare a new epoch. Alias for :meth:`new_epoch`."""
+        self.new_epoch(reset_means=reset_means)
+
+    def new_batch(self) -> None:
+        """Declare a new batch."""
+        # No longer just new epoch
+        self._just_new_epoch = False
+        # On tqdm context, the batch is automatically incremented
+        if not self._on_tqdm:
+            self.step += 1
+            self.current_batch += 1
+
+    def start_batch(self) -> None:
+        """Declare a new batch. Alias for :meth:`new_batch`."""
+        self.new_batch()
+
+    def detach(self, *, skipline: bool = True) -> None:
+        """Stop the live display.
+
+        Stop the live display while keeping the current display visible in
+        the terminal.
+
+        Note
+        ----
+            Calling :meth:`detach` or :meth:`stop` is necessary to print something
+            at the end of an epoch. Otherwise, the print will be shown above
+            the live display.
+        """
+        if self.console._live is not None:  # pylint: disable=protected-access
+            self.console._live.stop()  # pylint: disable=protected-access
+            self.console.clear_live()
+        if not self.silent and skipline:
+            self.console.print('')
+
+    def stop(self) -> None:
+        """Stop the live display.
+
+        Stop the live display while keeping the current display visible in
+        the terminal. Alias for :meth:`detach` with `skipline=False`.
+
+        Note
+        ----
+            Calling :meth:`stop` or :meth:`detach` is necessary to print something
+            at the end of an epoch. Otherwise, the print will be shown above
+            the live display.
+        """
+        self.detach(skipline=False)
+
+    def start(self) -> None:
+        """Set the start time of the training (already called at initialization)."""
+        self.t_glob = time.time()
+
+    def reset(self) -> None:
+        """Reset the logger as at initialization."""
+        self.stop()
+        self.step = 0
+        self.t_glob = time.time()
+        self.t_epoch = 0.0
+        self.current_epoch = 0
+        self.current_batch = 0
+        self._on_tqdm = False
+        self.vals = {}
+        self.mean_vals = {}
+        self._counts = {}
+        self.live = Live(
+            renderable=None,
+            console=RICH_CONSOLE,
+            refresh_per_second=4,
+            auto_refresh=False,
+        )
+        self.renderable = None
+
+    def get_vals(self, *, average: Optional[List[str]] = None) -> Dict[str, VarType]:
+        """Get the last values called with log, optionally averaged.
+
+        Parameters
+        ----------
+        average : List[str], optional
+            List of keys to return average. Support regex expressions.
+            None for no averaged value. By default None.
+
+        Returns
+        -------
+        Dict[str, VarType]
+            Last values called with log (optionally averaged).
+        """
+        if average is None:
+            average = []
+        vals = self.vals.copy()
+        for key in vals:
+            if key in average:
+                vals[key] = self.mean_vals[key]
+            else:
+                for pattern in average:
+                    if re.match(pattern, key):
+                        vals[key] = self.mean_vals[key]
+        return vals
+
+    def _prelog_check(self) -> None:
+        """Check if the logger is ready to log."""
+        err_message = ""
+        if self.current_epoch == 0:
+            err_message += (
+                "You must indicate a new epoch before logging "
+                "with `logger.new_epoch()` at start of the epoch.\n"
+            )
+        if self.current_batch == 0:
+            err_message += (
+                "You must indicate a new batch before logging "
+                "with `logger.new_batch()` just after batch loading.\n"
+            )
+        if err_message:
+            err_message += (
+                "Otherwise, you can use `for batch in logger.tqdm(dataset):` "
+                "in the batch loop."
+            )
+            raise ValueError(err_message)
+
     def _update_val(self, key: str, val: VarType) -> None:
         """Update the internal values."""
         if key not in self._counts:
@@ -428,7 +466,7 @@ class Logger:
             arrow_len = int(54 * (self.step % 100) / 99)
         bar_list = [' '] * 54
         for i in range(3):
-            bar_list[(arrow_len + i) % 54] = '●'
+            bar_list[(arrow_len + i) % 54] = '='
         return Text(f"[{''.join(bar_list)}]", overflow="ellipsis")
 
     def _build_time_info(self) -> Text:
@@ -466,6 +504,7 @@ class Logger:
         tables_list = [Table(show_header=False, show_edge=False)]
         table_width = 0
         row: List[Text] = []
+        flat_cell = len(values) < 3
         for key, val in values.items():
             # Get style, size and average bool
             style = self._get_param(
@@ -492,7 +531,10 @@ class Logger:
             # Add key and value on the cell
             key_style = str(style) + " bold" if self.bold_keys else style
             cell.append(str(key), style=key_style)
-            cell.append('\n' + str(val), style=style)
+            if flat_cell:
+                cell.append(': ' + str(val), style=style)
+            else:
+                cell.append('\n' + str(val), style=style)
             row.append(cell)
             table_width += cell_width
         # Add the last row
