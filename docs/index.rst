@@ -10,7 +10,7 @@ LoggerML
 
 Tired of watching a dull, unreadable or uninformative terminal screen
 all day long to monitor your ML training? Use LoggerML to brighten up
-your day in colour!
+your day in colour and save coding time!
 
 Github project:
 `valentingol/logml <https://github.com/valentingol/logml>`__.
@@ -21,13 +21,13 @@ Github project:
 
 |Ruff| |Flake8| |Pydocstyle| |MyPy| |PyLint|
 
-|Tests| |Coverage|
+|Tests| |Coverage| |Documentation|
 
 Log your Machine Learning training in the console in a beautiful way
 using `rich <https://github.com/Textualize/rich>`__\ ✨ with useful
 information but with minimal code.
 
-With only 3 short additional lines of code in your training loop you can
+With only 1 additional lines of code in your training loop you can
 get this:
 
 .. figure:: _static/base.png
@@ -38,9 +38,6 @@ like this:
 
 .. figure:: _static/advanced.png
    :alt: Alt text
-
-The logger provides also the possibility to average the logged values
-over an epoch or a full training.
 
 .. |PyPI version| image:: https://badge.fury.io/py/loggerml.svg
    :target: https://badge.fury.io/py/loggerml
@@ -65,6 +62,8 @@ over an epoch or a full training.
    :target: https://github.com/valentingol/logml/actions/workflows/tests.yaml
 .. |Coverage| image:: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/valentingol/451f91cece4478ebc81377e27e432f8b/raw/logml_tests.json
    :target: https://github.com/valentingol/logml/actions/workflows/tests.yaml
+.. |Documentation| image:: https://readthedocs.org/projects/logml/badge/?version=latest
+   :target: https://logml.readthedocs.io/en/latest/?badge=latest
 
 .. toctree::
    :maxdepth: 4
@@ -72,6 +71,8 @@ over an epoch or a full training.
 
    installation
    quickstart
+   vs_tqdm
+   with_tracker
    logml
    contribute
    license
