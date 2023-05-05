@@ -155,14 +155,15 @@ Please see our [contributing guidelines](CONTRIBUTING.md) for more information ð
 
 Priority:
 
-Secondary:
+- [ ] Finalize tests for 1.0.0 major release
 
-- [ ] Add docs sections: comparison with tqdm and how to use mean_vals
-  (with exp tracker)
-- [ ] Use regex for `styles`, `sizes` and `average` keys
+Secondary:
 
 Done:
 
+- [x] Add docs sections: comparison with tqdm and how to use mean_vals
+  (with exp tracker)
+- [x] Use regex for `styles`, `sizes` and `average` keys
 - [x] Be compatible with notebooks
 - [x] Get back the cursor when interrupting the training
 - [x] `logger.tqdm()` feature (used like `tqdm.tqdm`)
