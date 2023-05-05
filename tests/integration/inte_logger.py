@@ -7,7 +7,7 @@ from logml.logger import Logger
 
 def main() -> None:
     """Integration test for Logger."""
-    n_epochs = 5
+    n_epochs = 3
     n_batches = 10
     logger = Logger(
         n_epochs=n_epochs,
@@ -24,7 +24,7 @@ def main() -> None:
             logger.new_epoch()
             for batch in range(n_batches):
                 logger.new_batch()
-                time.sleep(0.02)
+                time.sleep(0.015)
                 styles = {"train loss": "green", "train acc": "blue"}
                 logger.log(
                     {
@@ -47,6 +47,14 @@ def main() -> None:
         sizes=3,
         message="\n",
     )
+    print('tqdm:')
+    logger = Logger(
+        n_epochs=2,
+        n_batches=10,
+    )
+    for _ in range(10):
+        for _ in logger.tqdm(range(10)):
+            logger.log({'loss': 0.02})
 
 
 if __name__ == "__main__":
