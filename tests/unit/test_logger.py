@@ -43,6 +43,7 @@ def test_logger() -> None:
             logger.reset()
             logger.bold_keys = False
             logger.n_batches = None
+    logger.log_interval = None
     logger.log(
         {f"new loss{i}": 0.4 for i in range(1, 16)},
         styles="red",
@@ -115,3 +116,23 @@ def test_tqdm() -> None:
         for _ in logger.tqdm(range(10)):
             pass
     check.equal(logger.n_batches, 10)
+
+
+def test_regex() -> None:
+    """Test regex matching."""
+    logger = Logger(
+        n_epochs=10,
+        n_batches=10,
+        styles={".* loss": "red", "train loss": "blue", ".* acc": "green"},
+    )
+    for _ in range(10):
+        for _ in logger.tqdm(range(10)):
+            logger.log(
+                {
+                    "val loss": 0.02,
+                    "train loss": 0.01,
+                    "train acc": 56,
+                    "val acc": 52
+                },
+                styles={"val.*": "yellow", "val acc": "blue"}
+            )
