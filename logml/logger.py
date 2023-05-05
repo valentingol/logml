@@ -1,7 +1,7 @@
 """Logger class."""
 import atexit
 import time
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 from rich.console import Group
 from rich.live import Live
@@ -35,7 +35,7 @@ class Logger:
         E.g. {'loss': 'bold red', 'acc': 'italic #af00ff'}
         Use a single string to apply the same style to all values.
         These styles can also be set or overwritten in the log method.
-        By default 'white'.
+        By default, use rich default style.
     sizes : Union[Dict, int], optional
         Default sizes to display for each numerical values.
         Note that the dot is counted as a character.
@@ -55,8 +55,8 @@ class Logger:
         Whether to show the time or not. By default True.
     bold_keys : bool, optional
         Whether to bold the key or not. By default False.
-    name_style: Optional[str], optional
-        Style of the name. Ignored if name is None. By default white.
+    name_style: str, optional
+        Style of the name. By default, use the rich default style.
     """
 
     def __init__(
@@ -66,7 +66,7 @@ class Logger:
         log_interval: Optional[int] = 1,
         name: Optional[str] = None,
         *,
-        styles: Union[Dict, str] = "white",
+        styles: Union[Dict, str] = "",
         sizes: Union[Dict, int] = 6,
         average: Optional[List[str]] = None,
         silent: bool = False,
@@ -91,15 +91,15 @@ class Logger:
         self.n_batches = n_batches
         self.log_interval = log_interval
         self.step = 0
-        self.start_glob = 0.0
-        self.start()  # Now, self.start_glob = time.time()
-        self.start_epoch = 0.0
+        self.t_glob = 0.0
+        self.start()  # Now, self.t_glob = time.time()
+        self.t_epoch = 0.0
         self.current_epoch = 0
         self.current_batch = 0
         # Internal values
-        self.vals: Dict = {}
+        self.vals: Dict = {}  # Last vals called inside log
         self._counts: Dict = {}
-        self.mean_vals: Dict = {}
+        self.mean_vals: Dict = {}  # Current mean vals
         # Rich elements
         self.live = Live(
             renderable=None,
@@ -111,21 +111,48 @@ class Logger:
         self.console = RICH_CONSOLE
         atexit.register(self.stop)
 
-    def start(self) -> None:
-        """Set the start time of the training (already called at initialization)."""
-        self.start_glob = time.time()
+    def tqdm(
+        self,
+        iterable: Iterable,
+        *,
+        reset_means: bool = True,
+    ) -> Any:
+        """Browse an iterable dataset and automatically update the epoch and batch.
 
-    def reset(self) -> None:
-        """Reset the logger as at initialization."""
-        self.stop()
-        self.step = 0
-        self.start_glob = time.time()
-        self.start_epoch = 0.0
-        self.current_epoch = 0
-        self.current_batch = 0
-        self.vals = {}
-        self.mean_vals = {}
-        self._counts = {}
+        No need to explicitly call `new_epoch` or `new_batch` as they are
+        automatically called. If n_batches is not specified and the iterable
+        implement a __len__ attribute, the number of batch is inferred
+        and store in self.n_batches.
+
+        Parameters
+        ----------
+        iterable : Iterable
+            Iterable dataset.
+        reset_means: bool, optional
+            Whether to reset the computed mean values at the start of the epoch.
+            By default True.
+        """
+        if self.n_batches is None and hasattr(iterable, "__len__"):
+            self.n_batches = len(iterable)  # type: ignore
+        self.new_epoch(reset_means=reset_means)
+        for batch in iterable:
+            self.new_batch()
+            yield batch
+        self.detach()
+
+    def new_epoch(
+        self,
+        *,
+        reset_means: bool = True,
+    ) -> None:
+        """Declare a new epoch.
+
+        Parameters
+        ----------
+        reset_means: bool, optional
+            Whether to reset the computed mean values at the start of the epoch.
+            By default True.
+        """
         self.live = Live(
             renderable=None,
             console=RICH_CONSOLE,
@@ -133,26 +160,31 @@ class Logger:
             auto_refresh=False,
         )
         self.renderable = None
-
-    def new_epoch(self, *, reset_avg: bool = True) -> None:
-        """Declare a new epoch."""
-        self.start_epoch = time.time()
-        self.current_epoch += 1
+        self.t_epoch = time.time()
+        # Avoid updating the epoch if no new batch has been declared.
+        if self.current_epoch == 0 or self.current_batch != 0:
+            self.current_epoch += 1
         self.current_batch = 0
-        if reset_avg:
+        if reset_means:
             self._counts = {key: 0 for key in self._counts}
             self.mean_vals = {key: 0 for key in self.mean_vals}
         # "Detach" the logs from the previous epoch
         self.detach()
-        self.live = Live(
-            renderable=None,
-            console=RICH_CONSOLE,
-            refresh_per_second=4,
-            auto_refresh=False,
-        )
-        self.renderable = None
         # Start the new live display
         self.live.start()
+
+    def start_epoch(self, *, reset_means: bool = True) -> None:
+        """Declare a new epoch. Alias for `new_epoch`."""
+        self.new_epoch(reset_means=reset_means)
+
+    def new_batch(self) -> None:
+        """Declare a new batch."""
+        self.step += 1
+        self.current_batch += 1
+
+    def start_batch(self) -> None:
+        """Declare a new batch. Alias for `new_batch`."""
+        self.new_batch()
 
     def detach(self, *, skipline: bool = True) -> None:
         """Stop the live display.
@@ -174,10 +206,28 @@ class Logger:
         """
         self.detach(skipline=False)
 
-    def new_batch(self) -> None:
-        """Declare a new batch."""
-        self.step += 1
-        self.current_batch += 1
+    def start(self) -> None:
+        """Set the start time of the training (already called at initialization)."""
+        self.t_glob = time.time()
+
+    def reset(self) -> None:
+        """Reset the logger as at initialization."""
+        self.stop()
+        self.step = 0
+        self.t_glob = time.time()
+        self.t_epoch = 0.0
+        self.current_epoch = 0
+        self.current_batch = 0
+        self.vals = {}
+        self.mean_vals = {}
+        self._counts = {}
+        self.live = Live(
+            renderable=None,
+            console=RICH_CONSOLE,
+            refresh_per_second=4,
+            auto_refresh=False,
+        )
+        self.renderable = None
 
     def _prelog_check(self) -> None:
         """Check if the logger is ready to log."""
@@ -338,8 +388,8 @@ class Logger:
         """Build time info text."""
         (delta_glob, delta_epoch, eta_glob, eta_epoch) = get_time_range(
             current_time=time.time(),
-            start_glob=self.start_glob,
-            start_epoch=self.start_epoch,
+            start_glob=self.t_glob,
+            start_epoch=self.t_epoch,
             current_epoch=self.current_epoch,
             current_batch=self.current_batch,
             n_epochs=self.n_epochs,

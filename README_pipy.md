@@ -5,7 +5,7 @@ Log your Machine Learning training in the console in a beautiful way using
 [rich](https://github.com/Textualize/rich)✨ with useful information but with
 minimal code.
 
-## Documentation [here :memo:](https://logml.readthedocs.io/en/latest/)
+## Documentation [here](https://logml.readthedocs.io/en/latest/)
 
 ---
 
@@ -34,11 +34,8 @@ In a new virtual environment, install simply the package via
 pip install loggerml
 ```
 
-## Supported platforms
-
 This package is supported on Linux, macOS and Windows.
-
-**Be careful, notebooks are not supported (but PR are welcome!).**
+It is also supported on Jupyter Notebooks.
 
 ## Quick start
 
@@ -55,15 +52,15 @@ from logml import Logger
 logger = Logger(n_epochs=4, n_batches=20)
 
 for _ in range(4):
-    logger.new_epoch()  # Indicate the start of a new epoch
-    for _ in range(20):
-        logger.new_batch()  # Indicate the start of a new batch
-
+    for _ in logger.tqdm(range(20)):
         time.sleep(0.1)  # Simulate a training step
-
         # Log whatever you want (int, float, str, bool):
-        logger.log({'loss': 0.54321256, 'accuracy': 0.85244777, 'loss name': 'MSE',
-                    'improve baseline': True})
+        logger.log({
+            'loss': 0.54321256,
+            'accuracy': 0.85244777,
+            'loss name': 'MSE',
+            'improve baseline': True,
+        })
 ```
 
 Yields:
@@ -82,7 +79,10 @@ Epoch 2/4, batch 8/20
  0.5432 |  0.8524  |    MSE    |       True
 ```
 
-And continue until the end of the loop.
+And continue until the end of the loop. Note that the expected remaining time of
+the overall train is displayed as well as the one for the epoch. The logger also
+provides also the possibility to average the logged values over an epoch or a
+full training.
 
 ### Advanced usage
 
@@ -118,9 +118,9 @@ val_logger = Logger(
     show_time=False,
 )
 for _ in range(2):
-    train_logger.new_epoch()
+    train_logger.new_epoch()  # Manually declare a new epoch
     for _ in range(20):
-        train_logger.new_batch()
+        train_logger.new_batch()  # Manually declare a new batch
         time.sleep(0.1)
         # Overwrite the default style for "loss" and add a message
         train_logger.log(
@@ -133,6 +133,7 @@ for _ in range(2):
         val_logger.new_batch()
         time.sleep(0.1)
         val_logger.log({'val loss': 0.65422135, 'val accuracy': 81.2658775})
+    val_logger.detach()  # End the live display to print something else after
 ```
 
 Yields:
@@ -159,7 +160,8 @@ With colors! See the gif
 ### Don't know the number of batches in advance?
 
 If you don't have the number of batches in advance, you can initialize the
-logger with `n_batches=None`. The progress bar is replaced by a cyclic animation. The eta times are not know at the first epoch but was estimated after the second epoch.
+logger with `n_batches=None`. The progress bar is replaced by a cyclic animation.
+The eta times are not know at the first epoch but was estimated after the second epoch.
 
 ## How to contribute
 
