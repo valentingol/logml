@@ -136,8 +136,8 @@ first epoch but was estimated after the second epoch.
 
 Priority:
 
-- [ ] Doc with Sphinx
 - [ ] Get back the cursor when interrupting the training
+- [ ] `logger.tqdm()` feature (used like `tqdm.tqdm`)
 
 Secondary:
 
@@ -147,6 +147,7 @@ Secondary:
 
 Done:
 
+- [x] Doc with Sphinx
 - [x] Be compatible with Windows and Macs
 - [x] Manage a validation loop (then multiple loggers)
 - [ ] ~~Enable not using `new_epoch/log()` if log config is minimal~~
