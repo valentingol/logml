@@ -29,7 +29,7 @@ Before proposing a PR you must follow some rule:
 Before submitting a PR you should run this pipeline:
 
 ```script
-sh pre-commit-checks.sh
+sh scripts/pre-commit-checks.sh
 ```
 
 **Try to not decrease the global Pylint score** after a pull request. A minimum

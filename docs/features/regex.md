@@ -22,6 +22,7 @@ For instance:
 logger = Logger(
     n_epochs=1,
     n_batches=1,
+    # Default styles config
     styles={".* loss": "red", "train loss": "blue", ".* acc": "green"},
 )
 for _ in range(1):
@@ -34,6 +35,7 @@ for _ in range(1):
                 "val loss": 0.02,
                 "val acc": 52
             },
+            # Log styles config
             styles={"val.*": "yellow", "val acc": "orange3"}
         )
 ```

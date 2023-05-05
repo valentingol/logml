@@ -27,17 +27,19 @@ Log your Machine Learning training in the console in a beautiful way
 using `rich <https://github.com/Textualize/rich>`__\ ✨ with useful
 information but with minimal code.
 
-With only 1 additional lines of code in your training loop you can
-get this:
+Simply add the a `logml.Logger` object in your training loop to have a complete
+overview of your training in the console.
 
 .. figure:: _static/base.png
    :alt: Alt text
 
-And you can simply customize your display to your liking, for instance
+And then, you can simply customize your display to your liking, for instance
 like this:
 
 .. figure:: _static/advanced.png
    :alt: Alt text
+
+Have a look on the `Quick start` section!
 
 .. |PyPI version| image:: https://badge.fury.io/py/loggerml.svg
    :target: https://badge.fury.io/py/loggerml
@@ -73,6 +75,6 @@ like this:
    quickstart
    vs_tqdm
    features/features
-   logml
+   logml_api
    contribute
    license

@@ -114,7 +114,9 @@ def test_tqdm() -> None:
     n_batches = 10
     logger = Logger(n_epochs=n_epochs, n_batches=n_batches)
     for _ in range(10):
+        logger.new_epoch()  # Should be avoided but should not raise error
         for _ in logger.tqdm(range(10)):
+            logger.new_batch()  # Should be avoided but should not raise error
             logger.log({'loss': 0.02})
     logger = Logger(n_epochs=1, n_batches=None)
     for _ in range(1):
