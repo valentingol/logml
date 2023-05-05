@@ -87,6 +87,11 @@ def test_internal_values() -> None:
     logger.new_batch()
     logger.log({'val1': 1.0, 'val2': 2.0})
     check.equal((logger.mean_vals['val1'], logger.mean_vals['val2']), (1.5, 1.5))
+    # Test get_vals
+    check.equal(logger.get_vals(average=['val2']), {'val1': 1.0, 'val2': 1.5})
+    check.equal(logger.get_vals(), {'val1': 1.0, 'val2': 2.0})
+    check.equal(logger.get_vals(average=['val.*']), {'val1': 1.5, 'val2': 1.5})
+
     logger.stop()
 
 
