@@ -72,7 +72,7 @@ like this:
    installation
    quickstart
    vs_tqdm
-   with_tracker
+   features/features
    logml
    contribute
    license
