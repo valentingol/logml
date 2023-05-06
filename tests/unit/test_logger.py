@@ -39,6 +39,7 @@ def test_logger() -> None:
                     styles=styles,
                     average=["mse"],
                 )
+                logger.log({"additional loss": 0.05})
         if i == 0:
             logger.reset()
             logger.bold_keys = False
