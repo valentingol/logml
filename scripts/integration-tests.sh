@@ -7,3 +7,5 @@ echo "*** tqdm ***"
 python tests/integration/inte_tqdm.py
 echo "*** 2 loggers ***"
 python tests/integration/inte_two_loggers.py
+echo "*** multi logs ***"
+python tests/integration/inte_multi_logs.py

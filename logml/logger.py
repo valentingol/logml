@@ -78,9 +78,9 @@ class Logger:
     current_batch : int
         Current batch number (starting at 1).
     vals : Dict[str, VarType]
-        Last values called inside log (not averaged or resized).
+        Last values called inside log (not averaged nor resized).
     mean_vals : Dict[str, VarType]
-        Current mean values.
+        Current mean values (only numerical values).
     """
 
     def __init__(
@@ -104,20 +104,20 @@ class Logger:
         self.name = name
         self.show_bar = show_bar
         self.show_time = show_time
-        # Default configs
-        self.name_style = name_style
-        self.default_styles = styles
-        self.default_sizes = sizes
-        self.default_average: Dict = {key: True for key in average} if average else {}
         self.bold_keys = bold_keys
+        # Default log configs
+        self.name_style = name_style
+        self._default_styles = styles
+        self._default_sizes = sizes
+        self._default_average: Dict = {key: True for key in average} if average else {}
         # Internal variables
         self.n_epochs = n_epochs
         self.n_batches = n_batches
         self.log_interval = log_interval
         self.step = 0
-        self.t_glob = 0.0
-        self.start()  # Now, self.t_glob = time.time()
-        self.t_epoch = 0.0
+        self._glob_time = 0.0
+        self.start()  # Now, self._glob_time = time.time()
+        self._epoch_time = 0.0
         self.current_epoch = 0
         self.current_batch = 0
         self._on_tqdm = False
@@ -133,15 +133,22 @@ class Logger:
             refresh_per_second=4,
             auto_refresh=False,
         )
-        self.renderable = None
+        self._renderable = None
         self.console = RICH_CONSOLE
+        # Table and message infos from the previous log of the same batch
+        self._prev_tables_list: List[Table] = []
+        self._prev_table_width = 0
+        self._prev_row: List[Text] = []
+        self._prev_flat_cell = True
+        self._prev_message = ''
+        # Force live display to end at exit
         atexit.register(self.stop)
 
     def log(
         self,
         values: Dict[str, VarType],
         *,
-        message: Optional[str] = None,
+        message: str = '',
         styles: Union[Dict[str, str], str, None] = None,
         sizes: Union[Dict[str, int], int, None] = None,
         average: Optional[List[str]] = None,
@@ -152,8 +159,8 @@ class Logger:
         ----------
         values : Dict[str, Any]
             Values to log. E.g. {'loss': 0.1, 'acc': 0.9}
-        message : Optional[str], optional
-            Message to display at the end of the log. By default None.
+        message : str, optional
+            Message to display at the end of the log. By default empty.
         styles : Union[Dict, str, None], optional
             Style of the values. Include color, bold, italic and more
             See https://rich.readthedocs.io/en/stable/style.html for more details.
@@ -209,11 +216,11 @@ class Logger:
             )
             renderables.append(vals_table)
         # Build message (if exists)
-        if message:
+        if message or self._prev_message:
             renderables.append(self._build_message(message))
 
         # Create renderable group and update the live display
-        self.renderable = Group(*renderables)
+        self._renderable = Group(*renderables)
         refresh = (
             # auto refresh regularly if no log interval
             self.log_interval is None
@@ -224,7 +231,7 @@ class Logger:
             # refresh at last batch (if n_batches is specified)
             or (self.n_batches and self.current_batch == self.n_batches)
         )
-        self.live.update(renderable=self.renderable, refresh=refresh)
+        self.live.update(renderable=self._renderable, refresh=refresh)
 
     def tqdm(
         self,
@@ -283,7 +290,7 @@ class Logger:
             refresh_per_second=4,
             auto_refresh=False,
         )
-        self.renderable = None
+        self._renderable = None
         # "Detach" the logs from the previous epoch
         self.detach()
         # Update epoch and batch
@@ -292,7 +299,7 @@ class Logger:
         # Start the new live display
         self.live.start()
         # Set the new epoch start time
-        self.t_epoch = time.time()
+        self._epoch_time = time.time()
 
     def start_epoch(self, *, reset_means: bool = True) -> None:
         """Declare a new epoch. Alias for :meth:`new_epoch`."""
@@ -306,6 +313,12 @@ class Logger:
         if not self._on_tqdm:
             self.step += 1
             self.current_batch += 1
+        # Reset the previous table info
+        self._prev_tables_list = []
+        self._prev_table_width = 0
+        self._prev_row = []
+        self._prev_flat_cell = True
+        self._prev_message = ''
 
     def start_batch(self) -> None:
         """Declare a new batch. Alias for :meth:`new_batch`."""
@@ -345,14 +358,14 @@ class Logger:
 
     def start(self) -> None:
         """Set the start time of the training (already called at initialization)."""
-        self.t_glob = time.time()
+        self._glob_time = time.time()
 
     def reset(self) -> None:
         """Reset the logger as at initialization."""
         self.stop()
         self.step = 0
-        self.t_glob = time.time()
-        self.t_epoch = 0.0
+        self._glob_time = time.time()
+        self._epoch_time = 0.0
         self.current_epoch = 0
         self.current_batch = 0
         self._on_tqdm = False
@@ -365,7 +378,12 @@ class Logger:
             refresh_per_second=4,
             auto_refresh=False,
         )
-        self.renderable = None
+        self._renderable = None
+        self._prev_tables_list = []
+        self._prev_table_width = 0
+        self._prev_row = []
+        self._prev_flat_cell = True
+        self._prev_message = ''
 
     def get_vals(self, *, average: Optional[List[str]] = None) -> Dict[str, VarType]:
         """Get the last values called with log, optionally averaged.
@@ -473,8 +491,8 @@ class Logger:
         """Build time info text."""
         (delta_glob, delta_epoch, eta_glob, eta_epoch) = get_time_range(
             current_time=time.time(),
-            start_glob=self.t_glob,
-            start_epoch=self.t_epoch,
+            start_glob=self._glob_time,
+            start_epoch=self._epoch_time,
             current_epoch=self.current_epoch,
             current_batch=self.current_batch,
             n_epochs=self.n_epochs,
@@ -501,18 +519,32 @@ class Logger:
         average: Union[Dict[str, bool], bool],
     ) -> Group:
         """Build a group of tables containing the keys and values."""
-        tables_list = [Table(show_header=False, show_edge=False)]
-        table_width = 0
-        row: List[Text] = []
-        flat_cell = len(values) < 3
+        # flat_cell = True => log "key: value"
+        # flat_cell = False => log "key \n value"
+        if not self._prev_tables_list:
+            # No previous logged values in same epoch
+            # => Adapt flat_cell to number of values
+            flat_cell = len(values) < 3
+        else:
+            # Previous logged values in same epoch => keep same flat_cell
+            flat_cell = self._prev_flat_cell
+
+        # The row contains all the values of the last table (if any)
+        tables_list = self._prev_tables_list[:-1]
+        row = self._prev_row
+        table_width = self._prev_table_width
+
+        # New table
+        tables_list.append(Table(show_header=False, show_edge=False))
+
         for key, val in values.items():
             # Get style, size and average bool
             style = self._get_param(
-                key, styles, self.default_styles, default_value='',
+                key, styles, self._default_styles, default_value='',
             )
-            size = self._get_param(key, sizes, self.default_sizes, default_value=6)
+            size = self._get_param(key, sizes, self._default_sizes, default_value=6)
             avg = self._get_param(
-                key, average, self.default_average, default_value=False
+                key, average, self._default_average, default_value=False
             )
             # Format value and get average if needed
             if isinstance(val, (int, float)) and not isinstance(val, bool):
@@ -520,7 +552,10 @@ class Logger:
                     val = self.mean_vals[key]
                 val = str(val)[: int(size)].ljust(int(size))
             # cell_width: expected length of the cell to be shown
-            cell_width = 3 + max(len(str(key)), len(str(val)))
+            if flat_cell:
+                cell_width = 3 + len(str(key)) + len(str(val))
+            else:
+                cell_width = 3 + max(len(str(key)), len(str(val)))
             # Create a new table when the current table is too wide
             if table_width + cell_width > self.console.width:
                 tables_list[-1].add_row(*row)
@@ -539,6 +574,11 @@ class Logger:
             table_width += cell_width
         # Add the last row
         tables_list[-1].add_row(*row)
+        # Store the tables, last row and its width for the next log of the same batch
+        self._prev_tables_list = tables_list
+        self._prev_table_width = table_width
+        self._prev_row = row
+        self._prev_flat_cell = flat_cell
         return Group(*tables_list)
 
     @staticmethod
@@ -566,6 +606,11 @@ class Logger:
 
     def _build_message(self, message: str) -> Text:
         """Build message."""
+        if not message and self._prev_message:
+            # No current message but previous message => keep previous message
+            message = self._prev_message
+        else:
+            self._prev_message = message
         return Text(message, justify='left')
 
 

@@ -13,14 +13,12 @@ for more information 🤗
 
 ## Todo list
 
-Priority:
-
-- [ ] Finalize tests for 1.0.0 major release
-
-Secondary:
+To do:
 
 Done:
 
+- [x] Allow multiple logs on the same batch
+- [x] Finalize tests for 1.0.0 major release
 - [x] Add docs sections: comparison with tqdm and how to use mean_vals
   (with exp tracker)
 - [x] Use regex for `styles`, `sizes` and `average` keys
