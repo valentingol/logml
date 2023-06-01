@@ -30,7 +30,7 @@ def main() -> None:
                     {
                         "train loss": 1 - epoch / n_epochs,
                         "train acc": 100 * batch / n_batches,
-                        "loss name": 'mse',
+                        "loss name": "mse",
                         "best run": True,
                     },
                     message="This is...\nok?",

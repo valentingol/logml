@@ -13,8 +13,8 @@ def main() -> None:
         logger.new_epoch()  # Not necessary
         for _ in logger.tqdm(range(10)):
             logger.new_batch()  # Not necessary
-            logger.log({'loss': 0.02})
+            logger.log({"loss": 0.02})
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
