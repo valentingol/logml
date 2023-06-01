@@ -90,14 +90,14 @@ class Logger:
         log_interval: Optional[int] = 1,
         name: Optional[str] = None,
         *,
-        styles: Union[Dict, str] = '',
+        styles: Union[Dict, str] = "",
         sizes: Union[Dict, int] = 6,
         average: Optional[List[str]] = None,
         silent: bool = False,
         show_bar: bool = True,
         show_time: bool = True,
         bold_keys: bool = False,
-        name_style: str = '',
+        name_style: str = "",
     ) -> None:
         # Log parameters
         self.silent = silent
@@ -140,7 +140,7 @@ class Logger:
         self._prev_table_width = 0
         self._prev_row: List[Text] = []
         self._prev_flat_cell = True
-        self._prev_message = ''
+        self._prev_message = ""
         # Force live display to end at exit
         atexit.register(self.stop)
 
@@ -148,7 +148,7 @@ class Logger:
         self,
         values: Dict[str, VarType],
         *,
-        message: str = '',
+        message: str = "",
         styles: Union[Dict[str, str], str, None] = None,
         sizes: Union[Dict[str, int], int, None] = None,
         average: Optional[List[str]] = None,
@@ -231,6 +231,7 @@ class Logger:
             # refresh at last batch (if n_batches is specified)
             or (self.n_batches and self.current_batch == self.n_batches)
         )
+
         self.live.update(renderable=self._renderable, refresh=refresh)
 
     def tqdm(
@@ -318,7 +319,7 @@ class Logger:
         self._prev_table_width = 0
         self._prev_row = []
         self._prev_flat_cell = True
-        self._prev_message = ''
+        self._prev_message = ""
 
     def start_batch(self) -> None:
         """Declare a new batch. Alias for :meth:`new_batch`."""
@@ -340,7 +341,7 @@ class Logger:
             self.console._live.stop()  # pylint: disable=protected-access
             self.console.clear_live()
         if not self.silent and skipline:
-            self.console.print('')
+            self.console.print("")
 
     def stop(self) -> None:
         """Stop the live display.
@@ -383,7 +384,7 @@ class Logger:
         self._prev_table_width = 0
         self._prev_row = []
         self._prev_flat_cell = True
-        self._prev_message = ''
+        self._prev_message = ""
 
     def get_vals(self, *, average: Optional[List[str]] = None) -> Dict[str, VarType]:
         """Get the last values called with log, optionally averaged.
@@ -439,10 +440,9 @@ class Logger:
             self.mean_vals[key] = 0
         self._counts[key] += 1
         if isinstance(val, (int, float)):
-            mean = (
-                (self.mean_vals[key] * (self._counts[key] - 1) + val)
-                / self._counts[key]
-            )
+            mean = (self.mean_vals[key] * (self._counts[key] - 1) + val) / self._counts[
+                key
+            ]
             self.mean_vals[key] = mean
         self.vals[key] = val
 
@@ -482,9 +482,9 @@ class Logger:
             arrow_len = int(54 * progress / 19)
         else:
             arrow_len = int(54 * (self.step % 100) / 99)
-        bar_list = [' '] * 54
+        bar_list = [" "] * 54
         for i in range(3):
-            bar_list[(arrow_len + i) % 54] = '='
+            bar_list[(arrow_len + i) % 54] = "="
         return Text(f"[{''.join(bar_list)}]", overflow="ellipsis")
 
     def _build_time_info(self) -> Text:
@@ -501,9 +501,7 @@ class Logger:
         delta_glob_str = sec_to_timestr(delta_glob)
         delta_epoch_str = sec_to_timestr(delta_epoch)
         eta_glob_str = sec_to_timestr(eta_glob) if eta_glob is not None else " ? "
-        eta_epoch_str = (
-            sec_to_timestr(eta_epoch) if eta_epoch is not None else " ? "
-        )
+        eta_epoch_str = sec_to_timestr(eta_epoch) if eta_epoch is not None else " ? "
         time_str = (
             f"[global {delta_glob_str} < {eta_glob_str} | "
             f"epoch {delta_epoch_str} < {eta_epoch_str}]"
@@ -540,7 +538,10 @@ class Logger:
         for key, val in values.items():
             # Get style, size and average bool
             style = self._get_param(
-                key, styles, self._default_styles, default_value='',
+                key,
+                styles,
+                self._default_styles,
+                default_value="",
             )
             size = self._get_param(key, sizes, self._default_sizes, default_value=6)
             avg = self._get_param(
@@ -567,9 +568,9 @@ class Logger:
             key_style = str(style) + " bold" if self.bold_keys else style
             cell.append(str(key), style=key_style)
             if flat_cell:
-                cell.append(': ' + str(val), style=style)
+                cell.append(": " + str(val), style=style)
             else:
-                cell.append('\n' + str(val), style=style)
+                cell.append("\n" + str(val), style=style)
             row.append(cell)
             table_width += cell_width
         # Add the last row
@@ -611,7 +612,7 @@ class Logger:
             message = self._prev_message
         else:
             self._prev_message = message
-        return Text(message, justify='left')
+        return Text(message, justify="left")
 
 
 def _regex_looking(key: str, config: DictVarType) -> Optional[VarType]:

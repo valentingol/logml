@@ -32,6 +32,19 @@ Note that the expected remaining time of the overall train is displayed as well 
 the one for the epoch. The logger also provides also the possibility to average the
 logged values over an epoch or a full training.
 
+## Save the logs
+
+In Linux you can use `tee` to save the logs in a file and display them in the console.
+However you need to use `unbuffer` to keep the style:
+
+```bash
+unbuffer python main.py --color=auto | tee output.log
+```
+
+See
+[here](https://superuser.com/questions/352697/preserve-colors-while-piping-to-tee)
+for details.
+
 ## Advanced usage
 
 Now you can add a validation logger, customize the logger with your own styles

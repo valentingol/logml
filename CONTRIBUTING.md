@@ -20,7 +20,7 @@ Before proposing a PR you must follow some rule:
 - Pull requests typically comprise a **single git commit**. In preparing a pull
   request for review, you may need to squash together multiple commits.
 
-- Code should work on Python 3.8-3.10
+- Code should work on Python 3.7-3.10
 
 - Code should respect [PEP8](https://peps.python.org/pep-0008/)
 
