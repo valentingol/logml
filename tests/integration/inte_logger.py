@@ -42,9 +42,9 @@ def main() -> None:
             logger.bold_keys = False
             logger.n_batches = None
     logger.log(
-        {f"new loss{i}": 0.3 for i in range(1, 20)},
+        {f"new loss{i}": 0.0000000001555555 for i in range(1, 20)},
         styles="red",
-        sizes=3,
+        sizes=4,
         message="\n",
     )
 
