@@ -551,7 +551,11 @@ class Logger:
             if isinstance(val, (int, float)) and not isinstance(val, bool):
                 if avg:
                     val = self.mean_vals[key]
-                val = str(val)[: int(size)].ljust(int(size))
+                val = str(val)
+                # Keep exp notation if needed
+                exp_ind = val.index("e") if "e" in val else len(val)
+                size = min(int(size), exp_ind)
+                val = val[:size].ljust(size) + val[exp_ind:]
             # cell_width: expected length of the cell to be shown
             if flat_cell:
                 cell_width = 3 + len(str(key)) + len(str(val))
