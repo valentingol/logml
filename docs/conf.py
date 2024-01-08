@@ -19,6 +19,7 @@ try:
     release = get_version()
 except:  # noqa E722
     release = get_version(root='..', relative_to=__file__)
+release = ".".join(release.split(".")[:3]) + ".dev" if "dev" in release else ""
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -30,6 +31,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     "sphinx_autodoc_typehints",
+    "sphinx_autodoc_defaultargs",
 ]
 
 master_doc = "index"
@@ -53,27 +55,34 @@ intersphinx_mapping = {
 templates_path = ['_templates']
 exclude_patterns = ['_build']
 
+rst_prolog = """
+.. |default| raw:: html
+
+    <div class="default-value-section">""" + \
+    ' <span class="default-value-label">Default:</span>'
+
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "sphinx_rtd_theme"
+html_theme = 'furo'
 html_static_path = ['_static']
+html_css_files = ["custom.css"]
 
-html_theme_options = {
-    "canonical_url": "",
-    "analytics_id": "UA-XXXXXXX-1",
-    "logo_only": False,
-    "display_version": True,
-    "prev_next_buttons_location": "both",
-    "style_external_links": "#ff9900",
-    "style_nav_header_background": "#ff9900",
-    # Toc options
-    "collapse_navigation": False,
-    "sticky_navigation": True,
-    "navigation_depth": 4,
-    "includehidden": True,
-    "titles_only": False,
-}
+# html_theme_options = {
+#     "canonical_url": "",
+#     "analytics_id": "UA-XXXXXXX-1",
+#     "logo_only": False,html_sidebars
+#     "display_version": True,
+#     "prev_next_buttons_location": "both",
+#     "style_external_links": "#ff9900",
+#     "style_nav_header_background": "#ff9900",
+#     # Toc options
+#     "collapse_navigation": False,
+#     "sticky_navigation": True,
+#     "navigation_depth": 4,
+#     "includehidden": True,
+#     "titles_only": False,
+# }
 html_context = {
     "display_github": True,  # Integrate GitHub
     "github_user": "valentingol",  # Username

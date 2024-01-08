@@ -1,0 +1,32 @@
+dd p.rubric,
+dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.glossary):not(.simple) .field-list>dt {
+    text-transform: capitalize;
+    font-weight: bold;
+    font-size: 115%;
+    background-clip: padding-box;
+}
+
+.sidebar-brand-text {
+    --color-sidebar-brand-text: #b13800;
+}
+
+.sidebar-tree {
+    font-size: 115%;
+    --color-sidebar-link-text--top-level: #c06600;
+    --color-sidebar-link-text: #9e9e9e;
+}
+
+.sig-name {
+    color: #c06600;
+}
+
+html {
+    font-size: 100%;
+}
+
+.sig:not(.sig-inline) {
+    font-family: var(--font-stack--monospace);
+    font-size: 105%;
+    font-weight: 700;
+    text-indent: -2.5em;
+}
