@@ -1,3 +1,4 @@
+# Copyright (c) 2023 Valentin Goldite. All Rights Reserved.
 """Test time_utils.py."""
 from typing import Any, Mapping
 

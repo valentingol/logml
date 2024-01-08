@@ -1,5 +1,5 @@
+# Copyright (c) 2023 Valentin Goldite. All Rights Reserved.
 """Integration tests for Logger."""
-
 import time
 
 from logml.logger import Logger
@@ -8,12 +8,12 @@ from logml.logger import Logger
 def main() -> None:
     """Integration test for Logger."""
     n_epochs = 3
-    n_batches = 10
+    n_batches = 8
     logger = Logger(
         n_epochs=n_epochs,
         n_batches=n_batches,
         log_interval=2,
-        sizes={"train acc": 2},
+        sizes={"train acc": 0.5},
         styles="yellow",
         average=["train loss"],
         bold_keys=True,
@@ -30,8 +30,8 @@ def main() -> None:
                     {
                         "train loss": 1 - epoch / n_epochs,
                         "train acc": 100 * batch / n_batches,
-                        "loss name": "mse",
-                        "best run": True,
+                        "loss name": "mae",
+                        "best run": epoch == n_epochs - 1 and batch == n_batches - 1,
                     },
                     message="This is...\nok?",
                     styles=styles,

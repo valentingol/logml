@@ -1,5 +1,5 @@
+# Copyright (c) 2023 Valentin Goldite. All Rights Reserved.
 """Integration tests for Logger.tqdm."""
-
 from logml.logger import Logger
 
 

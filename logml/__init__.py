@@ -1,3 +1,4 @@
+# Copyright (c) 2023 Valentin Goldite. All Rights Reserved.
 """LogML.
 
 Copyright (C) 2023  Valentin Goldité

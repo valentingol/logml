@@ -1,5 +1,5 @@
+# Copyright (c) 2023 Valentin Goldite. All Rights Reserved.
 """Integration tests for 2 loggers."""
-
 import time
 
 from logml.logger import Logger

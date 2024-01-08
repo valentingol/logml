@@ -1,3 +1,4 @@
+# Copyright (c) 2023 Valentin Goldite. All Rights Reserved.
 """Utilities for time data."""
 from typing import Optional, Tuple
 
