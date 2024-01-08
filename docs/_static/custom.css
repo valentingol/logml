@@ -11,7 +11,7 @@ dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.glossary):not(.
 }
 
 .sidebar-tree {
-    font-size: 115%;
+    font-size: 105%;
     --color-sidebar-link-text--top-level: #c06600;
     --color-sidebar-link-text: #9e9e9e;
 }
@@ -29,4 +29,11 @@ html {
     font-size: 105%;
     font-weight: 700;
     text-indent: -2.5em;
+}
+
+@media not print {
+    body[data-theme="dark"] {
+        --color-code-background: #202020;
+        --color-code-foreground: #d0d0d0;
+    }
 }
