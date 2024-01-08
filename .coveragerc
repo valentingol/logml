@@ -1,0 +1,2 @@
+[report]
+omit = logml/_version.py
