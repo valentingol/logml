@@ -5,7 +5,7 @@ Log your Machine Learning training in the console in a beautiful way using
 [rich](https://github.com/Textualize/rich)✨ with useful information but with
 minimal code.
 
-## Documentation [here :memo:](https://logml.readthedocs.io/en/latest/)
+## Documentation [here](https://logml.readthedocs.io/en/latest/)
 
 ---
 
@@ -66,7 +66,7 @@ for _ in range(4):
 
 Yields:
 
-![Alt Text](docs/_static/base.gif)
+![base-gif]([docs/_static/base.gif](https://raw.githubusercontent.com/valentingol/logml/main/docs/_static/base.gif))
 
 Note that the expected remaining time of the overall train is displayed as well as
 the one for the epoch. The logger also provides also the possibility to average the
@@ -138,7 +138,7 @@ for _ in range(2):
 
 Yields:
 
-![Alt Text](docs/_static/advanced.gif)
+![Alt Text]([docs/_static/advanced.gif](https://raw.githubusercontent.com/valentingol/logml/main/docs/_static/advanced.gif))
 
 ### Don't know the number of batches in advance?
 
@@ -146,7 +146,7 @@ If you don't have the number of batches in advance, you can initialize the logge
 with `n_batches=None`. Only the available information will be displayed. For instance
 with the configuration of the first example:
 
-![Alt Text](docs/_static/no_n_batches.png)
+![Alt Text](https://raw.githubusercontent.com/valentingol/logml/main/docs/_static/no_n_batches.png)
 
 The progress bar is replaced by a cyclic animation. The eta times are not know at the
 first epoch but was estimated after the second epoch.
