@@ -66,7 +66,7 @@ for _ in range(4):
 
 Yields:
 
-![base-gif]([docs/_static/base.gif](https://raw.githubusercontent.com/valentingol/logml/main/docs/_static/base.gif))
+![base-gif](https://raw.githubusercontent.com/valentingol/logml/main/docs/_static/base.gif))
 
 Note that the expected remaining time of the overall train is displayed as well as
 the one for the epoch. The logger also provides also the possibility to average the
@@ -138,7 +138,7 @@ for _ in range(2):
 
 Yields:
 
-![Alt Text]([docs/_static/advanced.gif](https://raw.githubusercontent.com/valentingol/logml/main/docs/_static/advanced.gif))
+![Alt Text](https://raw.githubusercontent.com/valentingol/logml/main/docs/_static/advanced.gif)
 
 ### Don't know the number of batches in advance?
 
