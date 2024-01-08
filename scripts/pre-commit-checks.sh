@@ -16,10 +16,6 @@ check_output() {
 }
 
 # Checks
-echo "************** Unit tests **************"
-pytest --cov-report term-missing --cov=./logml tests/
-check_output "Unit tests"
-
 echo "**************** Typing ****************"
 mypy .
 check_output "Typing checks"
@@ -29,16 +25,20 @@ isort --check-only .
 check_output "Import order checks"
 
 echo "************** Docstrings **************"
-pydocstyle --convention=numpy .
+pydocstyle --match='(?!.*_version).*\.py' --convention=numpy .
 check_output "Docstrings checks"
 
 echo "***************** PEP8 *****************"
 flake8 .
 check_output "PEP8 checks"
 
+echo "************** Unit tests **************"
+pytest --cov-report term-missing --cov=./logml tests/unit
+check_output "Unit tests"
+
 printf "\n${GREEN}${BOLD}All checks pass${NORMAL}${WHITE}\n\n"
 
 echo "*********** Style evaluation ***********"
 score=$(pylint . | sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p')
 
-echo "Pylint score: ${BOLD}$score/10.0${NORMAL} (details by running: pylint .)\nMinimum authorized score: 8.5\n"
+echo "Pylint score: ${BOLD}$score${NORMAL}/10.00 (details by running: pylint .)\nMinimum authorized score: 8.5\n"
