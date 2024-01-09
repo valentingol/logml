@@ -67,8 +67,6 @@ html_theme = 'furo'
 html_static_path = ['_static']
 html_css_files = ["custom.css"]
 
-# pygments_dark_style = "lightbulb"
-
 html_context = {
     "display_github": True,  # Integrate GitHub
     "github_user": "valentingol",  # Username
