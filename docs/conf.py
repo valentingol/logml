@@ -31,7 +31,6 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     "sphinx_autodoc_typehints",
-    "sphinx_autodoc_defaultargs",
 ]
 
 master_doc = "index"
@@ -68,21 +67,6 @@ html_theme = 'furo'
 html_static_path = ['_static']
 html_css_files = ["custom.css"]
 
-# html_theme_options = {
-#     "canonical_url": "",
-#     "analytics_id": "UA-XXXXXXX-1",
-#     "logo_only": False,html_sidebars
-#     "display_version": True,
-#     "prev_next_buttons_location": "both",
-#     "style_external_links": "#ff9900",
-#     "style_nav_header_background": "#ff9900",
-#     # Toc options
-#     "collapse_navigation": False,
-#     "sticky_navigation": True,
-#     "navigation_depth": 4,
-#     "includehidden": True,
-#     "titles_only": False,
-# }
 html_context = {
     "display_github": True,  # Integrate GitHub
     "github_user": "valentingol",  # Username
