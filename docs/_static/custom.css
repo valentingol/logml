@@ -31,9 +31,14 @@ html {
     text-indent: -2.5em;
 }
 
-@media not print {
-    body[data-theme="dark"] {
-        --color-code-background: #202020;
-        --color-code-foreground: #d0d0d0;
-    }
+.sig .n {
+    color: #2b6ea8;
+}
+
+body:not([data-theme="light"]) {
+    --color-highlight-on-target: #222222;
+    /* default #131416 */
+    --color-background-primary: #1d1d1d;
+    /* default #1a1c1e */
+    --color-background-secondary: #222222;
 }
