@@ -6,5 +6,6 @@ Features
    :caption: Contents:
 
    regex
+   pause
    no_batches
    with_tracker

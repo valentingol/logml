@@ -32,6 +32,16 @@ Note that the expected remaining time of the overall train is displayed as well 
 the one for the epoch. The logger also provides also the possibility to average the
 logged values over an epoch or a full training.
 
+## Pause and resume
+
+You can also pause and resume the logger internal time with `logger.pause()` and
+`logger.resume()`. You can check the internal time with `logger.get_current_time()`.
+Note that the resume method continues the time from **the last pause**.
+it means that if you pause the training logger at 10 seconds, then resume it
+at 20 seconds, the logger will display 10 seconds of training time. The global and
+the epoch time will be updated accordingly. You can also find examples in
+the documentation.
+
 ## Save the logs
 
 In Linux you can use `tee` to save the logs in a file and display them in the console.
