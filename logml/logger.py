@@ -116,13 +116,14 @@ class Logger:
         self.n_batches = n_batches
         self.log_interval = log_interval
         self.step = 0
-        self._glob_time = 0.0
-        self.start()  # Now, self._glob_time = time.time()
+        self._glob_time = 0.0  # Updated with .start() method
         self._epoch_time = 0.0
         self.current_epoch = 0
         self.current_batch = 0
         self._on_tqdm = False
         self._just_new_epoch = False
+        self._pause_time = -1.0  # Time when pause is called (-1 if not paused)
+        self._delta_pause_time = 0.0  # Time elapsed between pause and resume
         # Internal values
         self.vals: Dict = {}  # Last vals called inside log
         self._counts: Dict = {}
@@ -144,10 +145,16 @@ class Logger:
         self._prev_message = ""
         # Force live display to end at exit
         atexit.register(self.stop)
+        # Start
+        self.start()  # Now, self._glob_time = time.time()
+
+    def start(self) -> None:
+        """Set the start time of the training (already called at initialization)."""
+        self._glob_time = self.get_current_time()
 
     def log(
         self,
-        values: Dict[str, VarType],
+        values: Optional[Dict[str, VarType]] = None,
         *,
         message: str = "",
         styles: Union[Dict[str, str], str, None] = None,
@@ -158,7 +165,7 @@ class Logger:
 
         Parameters
         ----------
-        values : Dict[str, Any]
+        values : Dict[str, Any] | None
             Values to log. E.g. {'loss': 0.1, 'acc': 0.9}
         message : str, optional
             Message to display at the end of the log. By default empty.
@@ -184,6 +191,7 @@ class Logger:
             None to not average. By default None.
         """
         self._prelog_check()
+        values = {} if values is None else values
         # Update internal values
         for key, val in values.items():
             self._update_val(key, val)
@@ -301,7 +309,7 @@ class Logger:
         # Start the new live display
         self.live.start()
         # Set the new epoch start time
-        self._epoch_time = time.time()
+        self._epoch_time = self.get_current_time()
 
     def start_epoch(self, *, reset_means: bool = True) -> None:
         """Declare a new epoch. Alias for :meth:`new_epoch`."""
@@ -358,19 +366,35 @@ class Logger:
         """
         self.detach(skipline=False)
 
-    def start(self) -> None:
-        """Set the start time of the training (already called at initialization)."""
-        self._glob_time = time.time()
+    def pause(self) -> None:
+        """Pause the current time."""
+        self._pause_time = time.time()
+
+    def resume(self) -> None:
+        """Resume the current time if paused."""
+        if self._pause_time > 0.0:
+            # Update total time spent in pause periods
+            self._delta_pause_time += time.time() - self._pause_time
+            self._pause_time = -1.0
+
+    def get_current_time(self) -> float:
+        """Get the current time. Take into account the pause periods."""
+        # If currently paused, use the pause time
+        current_time = time.time() if self._pause_time < 0.0 else self._pause_time
+        # Subtract delta_current_time to get the time ignoring
+        # the time spent during pause/resume periods
+        return current_time - self._delta_pause_time
 
     def reset(self) -> None:
         """Reset the logger as at initialization."""
         self.stop()
         self.step = 0
-        self._glob_time = time.time()
         self._epoch_time = 0.0
         self.current_epoch = 0
         self.current_batch = 0
         self._on_tqdm = False
+        self._pause_time = -1.0
+        self._delta_pause_time = 0.0
         self.vals = {}
         self.mean_vals = {}
         self._counts = {}
@@ -386,6 +410,8 @@ class Logger:
         self._prev_row = []
         self._prev_flat_cell = True
         self._prev_message = ""
+        # Start
+        self.start()  # Now, self._glob_time = time.time()
 
     def get_vals(self, *, average: Optional[List[str]] = None) -> Dict[str, VarType]:
         """Get the last values called with log, optionally averaged.
@@ -491,7 +517,7 @@ class Logger:
     def _build_time_info(self) -> Text:
         """Build time info text."""
         (delta_glob, delta_epoch, eta_glob, eta_epoch) = get_time_range(
-            current_time=time.time(),
+            current_time=self.get_current_time(),
             start_glob=self._glob_time,
             start_epoch=self._epoch_time,
             current_epoch=self.current_epoch,
