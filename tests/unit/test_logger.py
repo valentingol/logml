@@ -1,5 +1,7 @@
 # Copyright (c) 2023 Valentin Goldite. All Rights Reserved.
 """Test logger.py."""
+import time
+
 import pytest
 import pytest_check as check
 
@@ -139,3 +141,27 @@ def test_regex() -> None:
                 {"val loss": 0.02, "train loss": 0.01, "train acc": 56, "val acc": 52},
                 styles={"val.*": "yellow", "val acc": "blue"},
             )
+
+
+def test_pause_resume() -> None:
+    """Test pause and resume."""
+    # pylint: disable=protected-access
+    logger = Logger(
+        n_epochs=1,
+        n_batches=1,
+    )
+    logger.new_epoch()
+    logger.new_batch()
+    logger.log({"loss": 0.02})
+    logger.pause()
+    time.sleep(1.1)
+    logger.resume()
+    time_text = logger._build_time_info().plain
+    time_parsed = time_text.split("global")[1].split("<")[0].strip()
+    check.is_true(time_parsed.endswith("00"))
+    check.is_true(logger.get_current_time() - logger._glob_time < 1)
+    time.sleep(1.1)
+    time_text = logger._build_time_info().plain
+    time_parsed = time_text.split("global")[1].split("<")[0].strip()
+    check.is_false(time_text.endswith("00"))
+    check.is_true(logger.get_current_time() - logger._glob_time > 1)
