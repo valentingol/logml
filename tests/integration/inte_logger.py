@@ -18,7 +18,6 @@ def main() -> None:
         average=["train loss"],
         bold_keys=True,
     )
-    logger.start()
     for i in range(2):
         for epoch in range(n_epochs):
             logger.new_epoch()
